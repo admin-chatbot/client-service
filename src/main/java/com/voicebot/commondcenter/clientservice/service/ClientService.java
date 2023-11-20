@@ -16,5 +16,7 @@ public interface ClientService {
 
     public Client save(Client client);
 
+    public Client register(Client client);
+
 
 }

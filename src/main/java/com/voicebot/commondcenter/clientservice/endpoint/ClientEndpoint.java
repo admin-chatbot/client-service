@@ -2,6 +2,7 @@ package com.voicebot.commondcenter.clientservice.endpoint;
 
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ public class ClientEndpoint {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> save(@RequestBody Client client) {
+    public ResponseEntity<?> save(@RequestBody @Valid Client client) {
+
         try {
             LOGGER.info("Client {} ",client);
             Client c =  clientService.save(client);
