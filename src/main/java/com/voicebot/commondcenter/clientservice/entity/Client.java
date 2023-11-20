@@ -1,6 +1,7 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -26,6 +27,7 @@ public class Client {
     @NotBlank(message = "Client Name should not null or empty.")
     private String clientName;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", locale = "en-PH")
     private Date registerDate;
 
     @Email(message = "Please provide valid email.")
@@ -34,10 +36,10 @@ public class Client {
     @NotBlank(message = "Password is mandatory.")
     private String password;
 
-    private Timestamp lastLogin;
+    private java.util.Date lastLogin;
 
     private String token;
 
-    private Timestamp expire;
+    private java.util.Date expire;
 
 }

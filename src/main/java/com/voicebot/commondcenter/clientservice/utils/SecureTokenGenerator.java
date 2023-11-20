@@ -23,7 +23,5 @@ public class SecureTokenGenerator {
         return new String(buf);
     }
 
-    public static void main(String[] args) {
-        System.out.println(nextToken());
-    }
+
 }
