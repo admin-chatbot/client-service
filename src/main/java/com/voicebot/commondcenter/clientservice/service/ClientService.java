@@ -24,4 +24,5 @@ public interface ClientService {
     public String login(Login login) throws InvalidUserNameAndPassword;
 
 
+    Optional<Client> authenticate(String accessToken);
 }

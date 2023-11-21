@@ -9,8 +9,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories
 public class ClientServiceApplication {
 
-
-
 	public static void main(String[] args) {
 		SpringApplication.run(ClientServiceApplication.class, args);
 	}

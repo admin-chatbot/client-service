@@ -79,4 +79,9 @@ public class ClientServiceImpl implements ClientService {
         }
         throw new InvalidUserNameAndPassword();
     }
+
+    @Override
+    public Optional<Client> authenticate(String accessToken) {
+        return Optional.empty();
+    }
 }
