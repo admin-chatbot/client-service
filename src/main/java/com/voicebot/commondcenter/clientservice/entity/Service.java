@@ -11,27 +11,32 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "service")
 @Data
 @Builder
 public class Service {
 
+    @Transient
+    public static final String SEQUENCE_NAME = "service_sequence";
+
     @Id
-    @JsonSerialize(using = ObjectIdJsonSerializer.class)
-    private ObjectId id;
+    private Long id;
 
     private String serviceName;
 
     private ArrayList<String> keyword;
 
-    private String serviceResponseType;
+    private List<String> serviceResponseType;
+
+    private List<ResponseMessage> responseForInvalidRequest;
 
     private String requestType;
 
     private String serviceEndpoint;
 
-    private ObjectId clientId;
+    private Long clientId;
 
     @Transient
     private ArrayList<ServiceParameter> serviceParameters;

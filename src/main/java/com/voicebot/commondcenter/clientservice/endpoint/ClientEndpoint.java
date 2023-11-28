@@ -2,6 +2,7 @@ package com.voicebot.commondcenter.clientservice.endpoint;
 
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -34,6 +35,7 @@ public class ClientEndpoint {
                     , name = "X-AUTH-LOG-HEADER"
                     , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
     })
+
     public ResponseEntity<?> getAllClient() {
         try {
             List<Client> clients = clientService.findAll();

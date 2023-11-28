@@ -6,6 +6,7 @@ import com.voicebot.commondcenter.clientservice.exception.EmailAlreadyRegistered
 import com.voicebot.commondcenter.clientservice.exception.InvalidUserNameAndPassword;
 import com.voicebot.commondcenter.clientservice.repository.ClientRepository;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
+import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.utils.EncryptDecryptPassword;
 import com.voicebot.commondcenter.clientservice.utils.SecureTokenGenerator;
 import org.bson.types.ObjectId;
@@ -23,6 +24,8 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    SequenceGeneratorService sequenceGeneratorService;
 
 
     @Override
@@ -31,12 +34,13 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Optional<Client> findOne(ObjectId id) {
+    public Optional<Client> findOne(Long id) {
         return clientRepository.findById(id);
     }
 
     @Override
     public Client save(Client client) {
+        client.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
         return clientRepository.save(client);
     }
 
@@ -48,6 +52,7 @@ public class ClientServiceImpl implements ClientService {
             throw new EmailAlreadyRegistered();
         }
 
+        client.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
         client.setPassword(EncryptDecryptPassword.encryptPassword(client.getPassword()));
         client.setRegisterDate(new Date(System.currentTimeMillis()));
         Client registeredClient = clientRepository.save(client);

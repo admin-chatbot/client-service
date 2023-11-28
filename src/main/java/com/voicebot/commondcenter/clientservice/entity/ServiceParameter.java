@@ -1,8 +1,6 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.voicebot.commondcenter.clientservice.utils.ObjectIdJsonSerializer;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -15,13 +13,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 public class ServiceParameter {
 
-    @Id
-    @JsonSerialize(using = ObjectIdJsonSerializer.class)
-    private ObjectId id;
+    @Transient
+    public static final String SEQUENCE_NAME = "serviceparameter_sequence";
 
-    private ObjectId serviceId;
+    @Id
+    private Long id;
+
+    private Long serviceId;
 
     private String name;
+
+    private String description;
 
     private String type; //NUMBER/BOOLEAN/STRING/DATE/TIMESTAMP
 
@@ -33,5 +35,7 @@ public class ServiceParameter {
 
     @Transient
     private Boolean questionAsked;
+
+
 
 }

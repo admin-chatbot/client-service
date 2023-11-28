@@ -15,7 +15,7 @@ public interface ClientService {
 
     public List<Client> findAll();
 
-    public Optional<Client> findOne(ObjectId id);
+    public Optional<Client> findOne(Long id);
 
     public Client save(Client client);
 
