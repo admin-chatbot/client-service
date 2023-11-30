@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import io.swagger.annotations.ApiOperation;
@@ -8,6 +9,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -37,7 +40,10 @@ public class ClientEndpoint {
                     , name = "X-AUTH-LOG-HEADER"
                     , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
     })
-
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Client.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     public ResponseEntity<?> getAllClient() {
         try {
             List<Client> clients = clientService.findAll();
@@ -56,6 +62,10 @@ public class ClientEndpoint {
                     , name = "X-AUTH-LOG-HEADER"
                     , content = @Content(schema = @Schema(type = "string", defaultValue = "0"))),
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Client.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     public ResponseEntity<?> save(@RequestBody @Valid Client client) {
 
         try {
