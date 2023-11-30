@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/service/discover/")
+@RequestMapping("/api/v1/service/")
 @CrossOrigin
 @Tag(name = "AutoDiscovery", description = "Auto Discovery Service APIs")
 public class AutoDiscoveryEndpoint {
@@ -47,7 +47,7 @@ public class AutoDiscoveryEndpoint {
 
 
 
-    @PostMapping()
+    @PostMapping(path = "discover/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -68,7 +68,7 @@ public class AutoDiscoveryEndpoint {
     }
 
 
-    @PostMapping()
+    @PostMapping(path = "load/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
