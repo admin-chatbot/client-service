@@ -12,6 +12,8 @@ import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
 import com.voicebot.commondcenter.clientservice.service.AutoDiscoveryService;
 import com.voicebot.commondcenter.clientservice.utils.URLReader;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -23,15 +25,16 @@ import java.util.Objects;
 @org.springframework.stereotype.Service
 public class AutoDiscoveryServiceImpl implements AutoDiscoveryService {
 
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoDiscoveryServiceImpl.class);
 
     @Autowired
     private URLReader urlReader;
 
+    private String baseURL;
+
     @Override
     public List<Service> discover(URL url ) throws Exception {
         ServiceDocsType docsType = findDocsType(String.valueOf(url));
-
 
         ApiInformationExtractor<?> apiInformationExtractor = null;
         if(docsType.equals(ServiceDocsType.OPENAPI))
@@ -47,6 +50,7 @@ public class AutoDiscoveryServiceImpl implements AutoDiscoveryService {
         }
 
         if(swaggerContent!=null) {
+            this.baseURL = swaggerContent.getBasePath();
             if (swaggerContent.getServices()!=null)
                 return swaggerContent.getServices()
                         .stream()
@@ -54,7 +58,6 @@ public class AutoDiscoveryServiceImpl implements AutoDiscoveryService {
                             .map(this::mapper)
                         .toList();
         }
-
         return null;
     }
 
@@ -97,7 +100,7 @@ public class AutoDiscoveryServiceImpl implements AutoDiscoveryService {
                      .method(serviceDTO.getMethod())
                      .serviceParameters(serviceParameters)
                      .summary(serviceDTO.getSummary())
-                     .endpoint(serviceDTO.getEndpoint())
+                     .endpoint(this.baseURL+ serviceDTO.getEndpoint())
                      .responseType(serviceDTO.getResponseType())
                      .responseForInvalidRequest(serviceDTO.getResponseForInvalidRequest())
                  .build();

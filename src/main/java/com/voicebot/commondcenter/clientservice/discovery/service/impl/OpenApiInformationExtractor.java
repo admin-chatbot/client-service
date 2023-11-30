@@ -65,8 +65,12 @@ public class OpenApiInformationExtractor implements ApiInformationExtractor<Open
             System.out.println("*************************");
             if(operation.getRequestBody()!=null)
                     service.setRequestType(Collections.singletonList(String.join(",", operation.getRequestBody().getContent().keySet())));
-            String response = operation.getResponses().values().stream().map(
-                    apiResponse -> String.join(",", apiResponse.getContent().keySet())).collect(Collectors.joining(","));
+
+            String response = "";
+
+            response = operation.getResponses().values().stream().filter(Objects::nonNull).map(
+                    apiResponse ->  apiResponse.getContent()!=null?String.join(",", apiResponse.getContent().keySet()):"").collect(Collectors.joining(","));
+
             service.setResponseType(Collections.singletonList(response));
             service.setMethod(type);
             service.setName(operation.getOperationId());
