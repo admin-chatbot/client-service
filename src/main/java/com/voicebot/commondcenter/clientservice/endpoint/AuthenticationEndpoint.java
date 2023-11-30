@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/api/v1/auth/",produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
+@Tag(name = "Authentication", description = "Authentication APIs")
 public class AuthenticationEndpoint {
 
     @Autowired

@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "serviceparameters")
 @Data
 @Builder
@@ -25,13 +27,17 @@ public class ServiceParameter {
 
     private String description;
 
-    private String type; //NUMBER/BOOLEAN/STRING/DATE/TIMESTAMP
+    private Boolean required;
+
+    private String type;
+
+    private String paramType;
+
+    private String in;
 
     private String value;
 
-    private String questionToGetInput;
-
-    private Boolean isRequired;
+    private List<String> questionToGetInput;
 
     @Transient
     private Boolean questionAsked;

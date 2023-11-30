@@ -14,7 +14,7 @@ public class SwaggerContent {
     private String info;
     private Authorization authorization;
     private List<String> produces;
-    private List<Service> services;
+    private List<ServiceDTO> services;
     private String apiVersion;
 
 }

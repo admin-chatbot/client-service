@@ -5,17 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceParameter {
+public class ServiceParameterDTO {
 
     private String name;
 
-    private String discription;
+    private String description;
 
     private Boolean required;
 

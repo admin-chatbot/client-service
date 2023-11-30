@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Service {
+public class ServiceDTO {
 
     private String endpoint;
 
@@ -29,6 +29,6 @@ public class Service {
 
     private List<ResponseMessage> responseForInvalidRequest;
 
-    private List<ServiceParameter> parameters;
+    private List<ServiceParameterDTO> parameters;
 
 }

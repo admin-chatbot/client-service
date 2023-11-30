@@ -4,6 +4,7 @@ import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.ServiceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/service/" )
+@Tag(name = "Service", description = "Service Management APIs")
 public class ServiceEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceEndpoint.class);

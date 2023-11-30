@@ -2,6 +2,8 @@ package com.voicebot.commondcenter.clientservice.entity;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.voicebot.commondcenter.clientservice.discovery.service.model.Authorization;
+import com.voicebot.commondcenter.clientservice.discovery.service.model.ResponseMessage;
 import com.voicebot.commondcenter.clientservice.utils.ObjectIdJsonSerializer;
 import lombok.Builder;
 import lombok.Data;
@@ -24,19 +26,27 @@ public class Service {
     @Id
     private Long id;
 
-    private String serviceName;
+    private String endpoint;
 
-    private ArrayList<String> keyword;
+    private String method; //GET/POST/PUT
 
-    private List<String> serviceResponseType;
+    private String name;
+
+    private String summary;
+
+    private Authorization authorization;
+
+    private List<String> responseType;
+
+    private List<String> requestType;
 
     private List<ResponseMessage> responseForInvalidRequest;
 
-    private String requestType;
-
-    private String serviceEndpoint;
+    private List<String> questionToBeAsked;
 
     private Long clientId;
+
+    private String responseTemplate;
 
     @Transient
     private ArrayList<ServiceParameter> serviceParameters;

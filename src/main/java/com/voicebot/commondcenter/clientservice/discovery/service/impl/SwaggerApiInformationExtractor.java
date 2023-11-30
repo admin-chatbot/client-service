@@ -2,7 +2,7 @@ package com.voicebot.commondcenter.clientservice.discovery.service.impl;
 
 import com.voicebot.commondcenter.clientservice.discovery.service.ApiInformationExtractor;
 import com.voicebot.commondcenter.clientservice.discovery.service.model.ResponseMessage;
-import com.voicebot.commondcenter.clientservice.discovery.service.model.Service;
+import com.voicebot.commondcenter.clientservice.discovery.service.model.ServiceDTO;
 import com.voicebot.commondcenter.clientservice.discovery.service.model.SwaggerContent;
 
 import io.swagger.models.Swagger;
@@ -40,11 +40,11 @@ public class SwaggerApiInformationExtractor implements ApiInformationExtractor<S
         swaggerContent.setBasePath("http://"+swagger.getHost()+swagger.getBasePath());
         swaggerContent.setProduces(swagger.getProduces());
 
-        List<Service> services = new ArrayList<>();
+        List<ServiceDTO> services = new ArrayList<>();
 
         swagger.getPaths().forEach((s, path) -> {
 
-            Service service = new Service();
+            ServiceDTO service = new ServiceDTO();
             service.setEndpoint(s);
 
             System.out.println("Path :"+s);
