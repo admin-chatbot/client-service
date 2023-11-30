@@ -5,8 +5,14 @@ import com.voicebot.commondcenter.clientservice.entity.Login;
 import com.voicebot.commondcenter.clientservice.exception.EmailAlreadyRegistered;
 import com.voicebot.commondcenter.clientservice.exception.InvalidUserNameAndPassword;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +26,22 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/api/v1/auth/",produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin
+@Tag(name = "Authentication", description = "Authentication APIs")
 public class AuthenticationEndpoint {
 
     @Autowired
     private ClientService clientService;
 
     @PostMapping(path = "register/",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
     private ResponseEntity<?> register(@Valid @RequestBody Client client) {
         try {
-            Client result = clientService.register(client);
-            return  ResponseEntity.ok().body(result);
+            clientService.register(client);
+            return  ResponseEntity.ok().body("Client is successfully registered with us.");
         }catch (EmailAlreadyRegistered emailAlreadyRegistered) {
             return  ResponseEntity.badRequest().body(emailAlreadyRegistered.getMessage());
         }
@@ -41,6 +53,11 @@ public class AuthenticationEndpoint {
 
 
     @PostMapping(path = "login/",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
     private ResponseEntity<?> login(@Valid @RequestBody Login login) {
         try {
             String token = clientService.login(login);

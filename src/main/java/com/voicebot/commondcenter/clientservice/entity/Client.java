@@ -2,27 +2,32 @@ package com.voicebot.commondcenter.clientservice.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.utils.ObjectIdJsonSerializer;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Timestamp;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Document(collection = "client")
 @Data
 @Builder
 public class Client {
+
+    @Transient
+    public static final String SEQUENCE_NAME = "client_sequence";
+
     @Id
-    @JsonSerialize(using = ObjectIdJsonSerializer.class)
-    private ObjectId id;
+    private Long id;
 
     @NotBlank(message = "Client Name should not null or empty.")
     private String clientName;
@@ -36,10 +41,29 @@ public class Client {
     @NotBlank(message = "Password is mandatory.")
     private String password;
 
+    @NotBlank(message = "Address is mandatory.")
+    private String address;
+
+    @NotBlank(message = "Contact Details is mandatory.")
+    private String contactNumber;
+
+    private Double turnover;
+
+    private int employeeCount;
+
+    private Status status;
+
+    private String gstNumber;
+
+    private List<ContactPerson> contactPerson;
+
     private java.util.Date lastLogin;
 
     private String token;
 
     private java.util.Date expire;
+
+    @Transient
+    private ArrayList<Service> services;
 
 }

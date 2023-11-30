@@ -15,7 +15,7 @@ public interface ClientService {
 
     public List<Client> findAll();
 
-    public Optional<Client> findOne(ObjectId id);
+    public Optional<Client> findOne(Long id);
 
     public Client save(Client client);
 
@@ -24,4 +24,5 @@ public interface ClientService {
     public String login(Login login) throws InvalidUserNameAndPassword;
 
 
+    Optional<Client> authenticate(String accessToken);
 }
