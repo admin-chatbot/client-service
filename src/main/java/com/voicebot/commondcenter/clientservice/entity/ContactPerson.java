@@ -7,10 +7,7 @@ import org.springframework.data.annotation.Id;
 @Data
 @Builder
 public class ContactPerson {
-
     private String name;
-
     private String number;
-
     private String designation;
 }

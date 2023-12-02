@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.voicebot.commondcenter.clientservice.discovery.service.model.Authorization;
 import com.voicebot.commondcenter.clientservice.discovery.service.model.ResponseMessage;
 import com.voicebot.commondcenter.clientservice.utils.ObjectIdJsonSerializer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -26,24 +29,31 @@ public class Service {
     @Id
     private Long id;
 
+    @NotBlank( message = "Endpoint should not null or empty.")
     private String endpoint;
 
+    private String keyword;
+
+    @NotBlank( message = "Method should not null or empty.")
     private String method; //GET/POST/PUT
 
+    @NotBlank( message = "Name should not null or empty.")
     private String name;
 
     private String summary;
 
     private Authorization authorization;
 
+    @NotNull( message = "Response Type should not null.")
     private List<String> responseType;
+
 
     private List<String> requestType;
 
     private List<ResponseMessage> responseForInvalidRequest;
 
-    private List<String> questionToBeAsked;
 
+    @NotNull( message = "Client Id should not null.")
     private Long clientId;
 
     private String responseTemplate;

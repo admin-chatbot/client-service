@@ -1,6 +1,8 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -21,14 +23,18 @@ public class ServiceLog {
     @Id
     private Long id;
 
+    @NotBlank( message = "Service Endpoint should not null or empty.")
     private String serviceEndpoint;
 
+    @NotBlank( message = "Service Name should not null or empty.")
     private String serviceName;
 
     private List<ServiceParameter> parameters;
 
+    @NotNull( message = "Name should not null or empty.")
     private Long client;
 
+    @NotNull( message = "Application Id should not null or empty.")
     private Long application;
 
     private Date logDate;

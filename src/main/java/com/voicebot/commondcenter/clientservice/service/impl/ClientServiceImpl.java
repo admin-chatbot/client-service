@@ -57,7 +57,7 @@ public class ClientServiceImpl implements ClientService {
         client.setRegisterDate(new Date(System.currentTimeMillis()));
         Client registeredClient = clientRepository.save(client);
         registeredClient.setPassword("");
-        return client;
+        return registeredClient;
     }
 
     @Override
