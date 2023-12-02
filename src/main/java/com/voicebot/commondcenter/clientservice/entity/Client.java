@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.sql.Timestamp;
 import java.util.Date;
 
+//*test
 @Document(collection = "client")
 @Data
 @Builder
