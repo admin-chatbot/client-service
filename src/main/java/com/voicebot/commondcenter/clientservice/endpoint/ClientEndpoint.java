@@ -2,6 +2,7 @@ package com.voicebot.commondcenter.clientservice.endpoint;
 
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
+import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,11 +59,6 @@ public class ClientEndpoint {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(parameters = {
-            @Parameter(in = ParameterIn.HEADER
-                    , name = "X-AUTH-LOG-HEADER"
-                    , content = @Content(schema = @Schema(type = "string", defaultValue = "0"))),
-    })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Client.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
@@ -71,6 +67,7 @@ public class ClientEndpoint {
 
         try {
             LOGGER.info("Client {} ",client);
+            client.setStatus(Status.NEW);
             Client c =  clientService.save(client);
             return ResponseEntity.ok(c);
         }catch (Exception exception) {
