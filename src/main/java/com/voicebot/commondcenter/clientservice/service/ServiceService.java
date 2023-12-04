@@ -13,4 +13,6 @@ public interface ServiceService {
     public Service save(Service service);
 
     List<Service> findAllByClientId(Long clientId);
+
+    List<Service> findServiceByClientIdAndKeywordLike(Long clientId,String keyword);
 }

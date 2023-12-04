@@ -1,6 +1,8 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -21,16 +23,20 @@ public class ServiceParameter {
     @Id
     private Long id;
 
+    @NotNull( message = "Service Id should not null.")
     private Long serviceId;
 
+    @NotBlank( message = "Name should not null or empty.")
     private String name;
 
     private String description;
 
     private Boolean required;
 
+    @NotBlank( message = "Type should not null or empty.")
     private String type;
 
+    @NotBlank( message = "Param Type should not null or empty.")
     private String paramType;
 
     private String in;
