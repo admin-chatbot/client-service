@@ -29,6 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/v1/service/" )
 @Tag(name = "Service", description = "Service Management APIs")
+@CrossOrigin
 public class ServiceEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceEndpoint.class);

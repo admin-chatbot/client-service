@@ -26,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/v1/client/" )
 @Tag(name = "Client", description = "Client Management APIs")
+@CrossOrigin
 public class ClientEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientEndpoint.class);
