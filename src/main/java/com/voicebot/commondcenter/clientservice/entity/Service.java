@@ -61,6 +61,9 @@ public class Service implements BaseEntity, Serializable {
     @NotNull( message = "Client Id should not null.")
     private Long clientId;
 
+    @NotNull( message = "Application Id should not null.")
+    private Long applicationId;
+
     private String responseTemplate;
 
     @Transient
