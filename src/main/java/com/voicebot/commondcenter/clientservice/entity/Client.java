@@ -6,14 +6,17 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.utils.ObjectIdJsonSerializer;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +24,9 @@ import java.util.List;
 @Document(collection = "client")
 @Data
 @Builder
-public class Client {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Client implements BaseEntity, Serializable {
 
     @Transient
     public static final String SEQUENCE_NAME = "client_sequence";

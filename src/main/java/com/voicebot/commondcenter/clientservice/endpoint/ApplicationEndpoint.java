@@ -1,7 +1,9 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
 import com.voicebot.commondcenter.clientservice.entity.Application;
+import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.service.ApplicationService;
+import com.voicebot.commondcenter.clientservice.service.ClientService;
 import io.swagger.v3.core.util.OpenAPISchema2JsonSchema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @CrossOrigin
 @RequestMapping(path = "/api/v1/application/")
@@ -28,6 +32,9 @@ public class ApplicationEndpoint {
 
     @Autowired
     private ApplicationService applicationService;
+
+    @Autowired
+    private ClientService clientService;
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -42,6 +49,11 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     public ResponseEntity<?> onBoard(@RequestBody @Valid Application application){
         try {
+
+
+
+            Optional<Client> client = clientService.findOne(application.getId());
+
             Application application1 = applicationService.onBoard(application);
             return ResponseEntity.ok(application1);
         }catch (Exception exception) {

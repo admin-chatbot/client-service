@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Login;
 import com.voicebot.commondcenter.clientservice.exception.EmailAlreadyRegistered;
@@ -53,18 +54,14 @@ public class AuthenticationEndpoint {
 
 
     @PostMapping(path = "login/",consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }),
-            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
-    })
     private ResponseEntity<?> login(@Valid @RequestBody Login login) {
         try {
             String token = clientService.login(login);
-            return  ResponseEntity.ok().body(token);
+            return  ResponseEntity.ok().body(ResponseBody.builder().data(token).build());
         }catch (InvalidUserNameAndPassword invalidUserNameAndPassword){
             return  ResponseEntity.badRequest().body(invalidUserNameAndPassword.getMessage());
         }catch (Exception exception) {
+            exception.printStackTrace();
             return ResponseEntity.internalServerError().body(exception.getMessage());
         }
     }

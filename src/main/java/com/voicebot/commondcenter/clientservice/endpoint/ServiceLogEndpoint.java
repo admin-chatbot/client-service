@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = "/api/v1/service/log/" )
 @Tag(name = "Service Log", description = "Service Log Management APIs")
+@CrossOrigin
 public class ServiceLogEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceLogEndpoint.class);
