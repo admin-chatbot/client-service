@@ -1,6 +1,8 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
-public class ResponseMessage {
+import java.io.Serializable;
+
+public class ResponseMessage implements BaseEntity, Serializable {
     private String code;
     public String message;
 }

@@ -68,7 +68,7 @@ public class ClientEndpoint {
         try {
             LOGGER.info("Client {} ",client);
             client.setStatus(Status.NEW);
-            Client c =  clientService.save(client);
+            Client c =  clientService.register(client);
             return ResponseEntity.ok(c);
         }catch (Exception exception) {
             LOGGER.error("",exception);

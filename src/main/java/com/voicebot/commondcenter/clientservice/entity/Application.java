@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Document(collection = "application")
 @Data
 @Builder
-public class Application implements Serializable {
+public class Application implements Serializable,BaseEntity {
 
     @Transient
     public static final String SEQUENCE_NAME = "application_sequence";
@@ -22,10 +22,10 @@ public class Application implements Serializable {
     @Id
     private Long id;
 
-    @NotBlank( message = "Name should nit null or empty.")
+    @NotBlank( message = "Name should not null or empty.")
     private String name;
 
-    @NotBlank( message = "Purpose should nit null or empty.")
+    @NotBlank( message = "Purpose should not null or empty.")
     private String purpose;
 
     @NotBlank( message = "Service Sources URL should nit null or empty.")
@@ -33,10 +33,10 @@ public class Application implements Serializable {
 
     private AuthMechanisms authMechanisms;
 
-    @NotBlank( message = "Service Doc URL should nit null or empty.")
+    @NotBlank( message = "Service Doc URL should not null or empty.")
     private String serviceDocUrl;
 
-    @NotNull(message = "Client Id should nit null or empty.")
+    @NotNull(message = "Client Id should not null or empty.")
     private Long clintId;
 
 }
