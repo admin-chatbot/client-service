@@ -2,16 +2,20 @@ package com.voicebot.commondcenter.clientservice.entity;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @Builder
-public class Login {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Login implements BaseEntity, Serializable {
 
-    @Email(message = "Please provide valid email.")
     private String email;
 
-    @NotBlank(message = "Password is mandatory.")
     private String password;
 }
