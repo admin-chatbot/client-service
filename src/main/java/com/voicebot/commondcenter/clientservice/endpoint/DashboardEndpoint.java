@@ -50,6 +50,7 @@ public class DashboardEndpoint {
         try {
             return ResponseEntity.ok(dashboardService.getDashboard());
         }catch (Exception exception) {
+            exception.printStackTrace();
             return ResponseEntity.internalServerError().body(exception.getMessage());
         }
     }

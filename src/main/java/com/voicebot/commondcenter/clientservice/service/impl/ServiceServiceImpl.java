@@ -20,6 +20,11 @@ public class ServiceServiceImpl implements ServiceService {
 
 
     @Override
+    public List<com.voicebot.commondcenter.clientservice.entity.Service> find() {
+        return serviceRepository.findAll();
+    }
+
+    @Override
     public com.voicebot.commondcenter.clientservice.entity.Service save(com.voicebot.commondcenter.clientservice.entity.Service service) {
         service.setId(sequenceGeneratorService.generateSequence(com.voicebot.commondcenter.clientservice.entity.Service.SEQUENCE_NAME));
         return serviceRepository.save(service);
