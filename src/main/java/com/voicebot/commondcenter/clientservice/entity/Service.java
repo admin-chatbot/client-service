@@ -50,11 +50,9 @@ public class Service implements BaseEntity, Serializable {
     @NotNull( message = "Response Type should not null.")
     private List<String> responseType;
 
-
     private List<String> requestType;
 
     private List<ResponseMessage> responseForInvalidRequest;
-
 
     @NotNull( message = "Client Id should not null.")
     private Long clientId;

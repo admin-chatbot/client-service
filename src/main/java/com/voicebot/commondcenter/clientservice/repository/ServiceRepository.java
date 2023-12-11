@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface ServiceRepository extends MongoRepository<Service, Long> {
-    List<Service> findServiceByClientId(Long clientId);
+    List<Service> findServicesByClientId(Long clientId);
 
-    List<Service> findServiceByClientIdAndKeywordLike(Long clientId,String keyword);
+    List<Service> findServicesByClientIdAndKeywordLike(Long clientId,String keyword);
 }
