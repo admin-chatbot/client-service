@@ -32,11 +32,11 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public List<com.voicebot.commondcenter.clientservice.entity.Service> findAllByClientId(Long clientId) {
-        return serviceRepository.findServiceByClientId(clientId);
+        return serviceRepository.findServicesByClientId(clientId);
     }
 
     @Override
     public List<com.voicebot.commondcenter.clientservice.entity.Service> findServiceByClientIdAndKeywordLike(Long clientId, String keyword) {
-        return serviceRepository.findServiceByClientIdAndKeywordLike(clientId, keyword);
+        return serviceRepository.findServicesByClientIdAndKeywordLike(clientId, keyword);
     }
 }
