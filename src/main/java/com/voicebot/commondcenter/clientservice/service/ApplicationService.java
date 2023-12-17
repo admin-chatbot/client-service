@@ -22,7 +22,8 @@ public interface ApplicationService {
 
     public Optional<Application> findOne(Long id);
 
-    public List<Application> findByClient(Long id);
+
+    public List<Application> findByClint(Long id);
     public Page<Application> findByClient(Pageable pageable, Long id);
 
 

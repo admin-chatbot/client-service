@@ -96,6 +96,18 @@ public class ServiceLogServiceImpl implements ServiceLogService {
 
     }
 
+    public List<ServiceCountDto> getMaximumCountByServiceNameByClient(Long clintId) {
+        GroupOperation groupByServiceEndpoint = Aggregation.group("serviceName").count().as("count");
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "count"));
+        ProjectionOperation project = Aggregation.project("serviceName", "count");
+        Aggregation aggregation = Aggregation.newAggregation(groupByServiceEndpoint, sortOperation, project);
+        AggregationResults<ServiceCountDto> output = mongoTemplate.aggregate(aggregation, "servicelog", ServiceCountDto.class);
+
+        logger.info("Raw results: {}" + output.getRawResults());
+        logger.info("Mapped results: {}" + output.getMappedResults());
+        return output.getMappedResults().stream().limit(10).toList();
+    }
+
     @Override
     public Long getTotalByApplication(String clientName) {
         return null;

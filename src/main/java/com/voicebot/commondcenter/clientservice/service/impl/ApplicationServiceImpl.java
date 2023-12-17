@@ -48,8 +48,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         return applicationRepository.findById(id);
     }
 
+
+
     @Override
-    public List<Application> findByClient(Long id) {
+    public List<Application> findByClint(Long id) {
         return applicationRepository.findApplicationsByClintId(id);
     }
 

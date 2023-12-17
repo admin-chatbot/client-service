@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.Serializable;
 import java.util.Date;
 
-@Document(collection = "botrequest")
+@Document(collection = "botrequestlog")
 @Data
 @Builder
 @AllArgsConstructor
