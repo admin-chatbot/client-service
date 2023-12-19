@@ -1,17 +1,26 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
+import com.voicebot.commondcenter.clientservice.dto.ServiceCountDto;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
 import com.voicebot.commondcenter.clientservice.repository.ServiceLogRepository;
 import com.voicebot.commondcenter.clientservice.service.ServiceLogService;
+import org.springframework.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class ServiceLogServiceImpl implements ServiceLogService {
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Autowired
     private ServiceLogRepository serviceLogRepository;
@@ -54,6 +63,37 @@ public class ServiceLogServiceImpl implements ServiceLogService {
     @Override
     public Long getTotalByApplication(Long id) {
         return null;
+    }
+
+
+    Logger logger = Logger.getLogger(ServiceLogServiceImpl.class.getName());
+    @Override
+    public List<ServiceCountDto> getMaximumCountByServiceName() {
+
+        GroupOperation groupByServiceEndpoint = Aggregation.group("serviceName").count().as("count");
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "count"));
+        ProjectionOperation project = Aggregation.project("serviceName", "count");
+        Aggregation aggregation = Aggregation.newAggregation(groupByServiceEndpoint, sortOperation, project);
+        AggregationResults<ServiceCountDto> output = mongoTemplate.aggregate(aggregation, "servicelog", ServiceCountDto.class);
+
+        logger.info("Raw results: {}" + output.getRawResults());
+        logger.info("Mapped results: {}" + output.getMappedResults());
+        return output.getMappedResults().stream().limit(10).toList();
+
+    }
+
+    public List<ServiceCountDto> getMinimumCountByServiceName() {
+
+        GroupOperation groupByServiceEndpoint = Aggregation.group("serviceName").count().as("count");
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "count"));
+        ProjectionOperation project = Aggregation.project("serviceName", "count");
+        Aggregation aggregation = Aggregation.newAggregation(groupByServiceEndpoint, sortOperation, project);
+        AggregationResults<ServiceCountDto> output = mongoTemplate.aggregate(aggregation, "servicelog", ServiceCountDto.class);
+        logger.info("Raw results: {}" + output.getRawResults());
+        logger.info("Mapped results: {}" + output.getMappedResults());
+        return output.getMappedResults().stream().limit(10).toList();
+
+
     }
 
     @Override
