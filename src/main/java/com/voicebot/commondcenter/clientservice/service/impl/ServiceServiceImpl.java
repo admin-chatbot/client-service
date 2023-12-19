@@ -1,6 +1,7 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
 
+import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.repository.ServiceRepository;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.ServiceService;
@@ -27,6 +28,7 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public com.voicebot.commondcenter.clientservice.entity.Service save(com.voicebot.commondcenter.clientservice.entity.Service service) {
         service.setId(sequenceGeneratorService.generateSequence(com.voicebot.commondcenter.clientservice.entity.Service.SEQUENCE_NAME));
+        service.setStatus(Status.NEW);
         return serviceRepository.save(service);
     }
 

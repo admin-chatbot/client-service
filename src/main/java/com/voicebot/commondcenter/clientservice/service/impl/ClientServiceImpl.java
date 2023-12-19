@@ -61,7 +61,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public String login(Login login) throws InvalidUserNameAndPassword {
+    public Client login(Login login) throws InvalidUserNameAndPassword {
 
         Optional<Client> client = clientRepository.findClientByEmail(login.getEmail());
         if (client.isPresent()) {
@@ -74,9 +74,9 @@ public class ClientServiceImpl implements ClientService {
                 registeredClient.setLastLogin(new Timestamp(System.currentTimeMillis()));
                 registeredClient.setExpire(new Timestamp(System.currentTimeMillis()));
 
-                clientRepository.save(registeredClient);
+                registeredClient = clientRepository.save(registeredClient);
 
-                return token;
+                return registeredClient;
 
             } else {
                 throw new InvalidUserNameAndPassword();
