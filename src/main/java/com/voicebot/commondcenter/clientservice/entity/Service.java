@@ -4,6 +4,7 @@ package com.voicebot.commondcenter.clientservice.entity;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.voicebot.commondcenter.clientservice.discovery.service.model.Authorization;
 import com.voicebot.commondcenter.clientservice.discovery.service.model.ResponseMessage;
+import com.voicebot.commondcenter.clientservice.enums.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -61,6 +62,8 @@ public class Service implements BaseEntity, Serializable {
     private Long applicationId;
 
     private String responseTemplate;
+
+    private Status status;
 
     @Transient
     private ArrayList<ServiceParameter> serviceParameters;

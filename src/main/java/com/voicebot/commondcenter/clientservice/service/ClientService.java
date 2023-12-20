@@ -21,7 +21,7 @@ public interface ClientService {
 
     public Client register(Client client) throws EmailAlreadyRegistered;
 
-    public String login(Login login) throws InvalidUserNameAndPassword;
+    public Client login(Login login) throws InvalidUserNameAndPassword;
 
 
     Optional<Client> authenticate(String accessToken);

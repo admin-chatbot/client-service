@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.service;
 
+import com.voicebot.commondcenter.clientservice.dto.ServiceCountDto;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,10 @@ public interface ServiceLogService {
 
     public Long getTotalByApplication(Long id);
 
+    public List<ServiceCountDto> getMaximumCountByServiceName();
+
+    public List<ServiceCountDto> getMinimumCountByServiceName();
+
     public Long getTotalByApplication(String clientName);
 
     public Long getTotalByClientAndApplication(Long id);
@@ -33,6 +38,7 @@ public interface ServiceLogService {
     public Long getTotalByClientAndApplication(String clientName);
 
     public List<String> getTopNServices(int n);
+
 
 
 }

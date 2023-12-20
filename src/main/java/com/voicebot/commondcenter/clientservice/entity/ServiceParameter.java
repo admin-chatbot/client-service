@@ -29,7 +29,7 @@ public class ServiceParameter implements BaseEntity, Serializable {
     private Long id;
 
     @NotNull( message = "Service Id should not null.")
-    private Long serviceId;
+    private long serviceId;
 
     @NotBlank( message = "Name should not null or empty.")
     private String name;
@@ -48,7 +48,7 @@ public class ServiceParameter implements BaseEntity, Serializable {
 
     private String value;
 
-    private List<String> questionToGetInput;
+        private List<String> questionToGetInput;
 
     @Transient
     private Boolean questionAsked;
