@@ -8,24 +8,23 @@ import com.voicebot.commondcenter.clientservice.enums.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "service")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Service implements BaseEntity, Serializable {
+public class Service extends AbstractBaseEntity implements  Serializable {
 
     @Transient
     public static final String SEQUENCE_NAME = "service_sequence";
@@ -61,9 +60,11 @@ public class Service implements BaseEntity, Serializable {
     @NotNull( message = "Application Id should not null.")
     private Long applicationId;
 
-    private String responseTemplate;
+    private String botResponseTemplate;
 
     private Status status;
+
+    private String response;
 
     @Transient
     private ArrayList<ServiceParameter> serviceParameters;
