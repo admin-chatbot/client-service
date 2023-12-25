@@ -2,18 +2,16 @@ package com.voicebot.commondcenter.clientservice.entity;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Data
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Login implements BaseEntity, Serializable {
+public class Login extends AbstractBaseEntity implements  Serializable {
 
     private String email;
 

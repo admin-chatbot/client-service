@@ -35,9 +35,9 @@ public class AuthenticationEndpoint {
 
     @PostMapping(path = "register/",consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses({
-            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }),
-            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.APPLICATION_JSON_VALUE) }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.APPLICATION_JSON_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.APPLICATION_JSON_VALUE) })
     })
     private ResponseEntity<?> register(@Valid @RequestBody Client client) {
         try {
@@ -56,8 +56,15 @@ public class AuthenticationEndpoint {
     @PostMapping(path = "login/",consumes = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<?> login(@Valid @RequestBody Login login) {
         try {
-            String token = clientService.login(login);
-            return  ResponseEntity.ok().body(ResponseBody.builder().data(token).build());
+            Client client = clientService.login(login);
+
+            Client partialClient = Client.builder()
+                    .id(client.getId())
+                    .token(client.getToken())
+                    .email(client.getEmail())
+                    .clientName(client.getClientName())
+                    .build();
+            return  ResponseEntity.ok().body(ResponseBody.builder().data(partialClient).build());
         }catch (InvalidUserNameAndPassword invalidUserNameAndPassword){
             return  ResponseEntity.badRequest().body(invalidUserNameAndPassword.getMessage());
         }catch (Exception exception) {
