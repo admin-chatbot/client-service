@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.*;
@@ -25,6 +26,7 @@ public class Application extends AbstractBaseEntity implements Serializable {
     @Id
     private Long id;
 
+    @Indexed(unique = true)
     @NotBlank( message = "Name should not null or empty.")
     private String name;
 

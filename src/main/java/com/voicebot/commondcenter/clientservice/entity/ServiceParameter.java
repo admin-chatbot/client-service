@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@CompoundIndex(name = "unq_name_in",def = "{ 'serviceId':1,'in': 1,'name':1}", unique = true)
 public class ServiceParameter extends AbstractBaseEntity implements Serializable {
 
     @Transient

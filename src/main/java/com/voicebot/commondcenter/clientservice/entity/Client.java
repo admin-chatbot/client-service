@@ -10,6 +10,7 @@ import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
@@ -38,6 +39,7 @@ public class Client extends AbstractBaseEntity implements  Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", locale = "en-PH")
     private Date registerDate;
 
+    @Indexed(unique = true)
     @Email(message = "Please provide valid email.")
     private String email;
 

@@ -17,6 +17,8 @@ public interface ServiceParameterService {
 
     public ServiceParameter save(ServiceParameter serviceParameter);
 
+    public List<ServiceParameter> save(List<ServiceParameter> serviceParameters);
+
     public List<ServiceParameter> findByServiceId(Long serviceId);
 
     public Page<ServiceParameter> find(Pageable pageable);

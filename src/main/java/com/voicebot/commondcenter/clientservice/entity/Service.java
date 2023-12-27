@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -24,6 +25,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@CompoundIndex(name = "unq_name_method_endpoint",def = "{'endpoint': 1, 'method': 1,'name':1}", unique = true)
 public class Service extends AbstractBaseEntity implements  Serializable {
 
     @Transient

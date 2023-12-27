@@ -14,6 +14,9 @@ public class AutoDiscoverServiceRequest {
     @NotBlank(message = "Docs url should not null or empty.")
     private String url;
 
+    private Long serviceId;
+
+    private Long applicationId;
 
     private List<AutoDiscoverServiceRequestBody> autoDiscoverServiceRequestBodies;
 }
