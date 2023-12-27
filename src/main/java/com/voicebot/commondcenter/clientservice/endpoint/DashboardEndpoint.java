@@ -1,7 +1,9 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
+import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.service.ApplicationService;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.DashboardService;
@@ -55,4 +57,26 @@ public class DashboardEndpoint {
         }
     }
 
+    @GetMapping(path="{clintId}/")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = com.voicebot.commondcenter.clientservice.dto.ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getDashboardByClientId(@PathVariable(name="clintId") Long clintId) {
+        try {
+            return ResponseEntity.ok(dashboardService.getDashboardByClintId(clintId));
+        }catch (Exception exception){
+            LOGGER.error("",exception);
+            return ResponseEntity
+                    .internalServerError()
+                    .body(exception.getMessage());
+        }
+    }
 }

@@ -40,5 +40,8 @@ public interface ServiceLogService {
     public List<String> getTopNServices(int n);
 
 
+    public List<ServiceCountDto> getMaximumCountByServiceNameByClient(Long clintId);
+
+
 
 }

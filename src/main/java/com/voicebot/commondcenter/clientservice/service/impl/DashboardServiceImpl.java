@@ -1,10 +1,7 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
 import com.voicebot.commondcenter.clientservice.dto.DashboardDto;
-import com.voicebot.commondcenter.clientservice.service.ApplicationService;
-import com.voicebot.commondcenter.clientservice.service.DashboardService;
-import com.voicebot.commondcenter.clientservice.service.ServiceLogService;
-import com.voicebot.commondcenter.clientservice.service.ServiceService;
+import com.voicebot.commondcenter.clientservice.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +16,17 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Autowired
     private ServiceLogService serviceLogService;
+
+    @Autowired    public BotRequestLogService botRequestLogService;
     @Autowired
     public ApplicationService getApplicationService() {
-            return applicationService;
+        return applicationService;
     }
 
+    @Autowired
+    public BotRequestLogService getBotRequestLogService() {
+        return botRequestLogService;
+    }
     @Autowired
     public ServiceService getServiceService() {
         return serviceService;
@@ -35,10 +38,23 @@ public class DashboardServiceImpl implements DashboardService {
         dashboardDto.setApplicationCount(applicationService.find().size());
         dashboardDto.setServiceCount(serviceService.find().size());
         dashboardDto.setTopUsed10Services(serviceLogService.getMaximumCountByServiceName());
-        dashboardDto.setLeastUsed10Services(serviceLogService.getMinimumCountByServiceName());
+        dashboardDto.setMostActiveClient(botRequestLogService.getMostActiveClient());
+        dashboardDto.setLeastActiveClient(botRequestLogService.getLeastActiveClient());
+        //dashboardDto.setCountOfSucccessCalls(botRequestLogService.countOfSuccessCalls());
 
         return dashboardDto;
     }
 
+    @Override
+    public DashboardDto getDashboardByClintId(Long clintId) {
+        DashboardDto dashboardDto = new DashboardDto();
+        dashboardDto.setApplicationCount(applicationService.findByClint(clintId).size());
+        dashboardDto.setServiceCount(serviceService.findAllByClientId(clintId).size());
+        dashboardDto.setTopUsed10Services(serviceLogService.getMaximumCountByServiceName());
+        dashboardDto.setMostActiveClient(botRequestLogService.getMostActiveClient());
+        dashboardDto.setLeastActiveClient(botRequestLogService.getLeastActiveClient());
+        //dashboardDto.setCountOfSucccessCalls(botRequestLogService.countOfSuccessCalls());
 
+        return dashboardDto;
+    }
 }
