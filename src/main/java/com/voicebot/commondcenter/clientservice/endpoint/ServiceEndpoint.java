@@ -22,9 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/v1/service/" )
@@ -36,6 +38,8 @@ public class ServiceEndpoint {
 
     @Autowired
     private ServiceService serviceService;
+
+
 
 
     @GetMapping(path="{clientId}/")
@@ -52,6 +56,7 @@ public class ServiceEndpoint {
     })
     public ResponseEntity<?> getAllServiceByClientId(@PathVariable(name="clientId") Long clientId) {
         try {
+            LOGGER.info("getAllServiceByClientId");
             List<Service> services = serviceService.findAllByClientId(clientId);
             return ResponseEntity.ok(services);
         }catch (Exception exception){
@@ -112,6 +117,56 @@ public class ServiceEndpoint {
     public ResponseEntity<?> save(@RequestBody @Valid Service service) {
         try {
             LOGGER.info("Client {} ",service);
+            Service c =  serviceService.save(service);
+            return ResponseEntity.ok(c);
+        }catch (Exception exception) {
+            LOGGER.error(exception.getMessage(),exception);
+            return ResponseEntity.internalServerError().body( ResponseBody.builder()
+                    .message(exception.getMessage())
+                    .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .exception(exception)
+                    .build()  );
+        }
+    }
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "206", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> edit(@RequestBody @Valid Service service) {
+        try {
+            LOGGER.info("Client {} ",service);
+
+            if( service == null){
+                return ResponseEntity.badRequest().body( ResponseBody.builder()
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .build() );
+            }
+
+             if(service.getId()==null) {
+                 return ResponseEntity.badRequest().body( ResponseBody.builder()
+                         .message("Service Id Should not be null.")
+                         .code(HttpStatus.PARTIAL_CONTENT.value())
+                         .build() );
+             }
+
+            Optional<Service> serviceFromDb = serviceService.fetchOne(service.getId());
+
+             if(serviceFromDb.isEmpty()) {
+                 return ResponseEntity.badRequest().body( ResponseBody.builder()
+                         .message("Service is not valid ")
+                         .code(HttpStatus.BAD_REQUEST.value())
+                         .build() );
+             }
             Service c =  serviceService.save(service);
             return ResponseEntity.ok(c);
         }catch (Exception exception) {

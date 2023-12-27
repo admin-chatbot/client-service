@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @org.springframework.stereotype.Service
 public class AutoDiscoveryServiceImpl implements AutoDiscoveryService {
@@ -93,15 +91,38 @@ public class AutoDiscoveryServiceImpl implements AutoDiscoveryService {
                         .map(this::parameterMapper)
                     .toList());
 
+
+        Set<String> requestTypesSet = new HashSet<>();
+        if (serviceDTO.getRequestType()!=null) {
+            serviceDTO.getRequestType().forEach(s -> {
+                String[] reqTypes = StringUtils.split(s,",");
+                requestTypesSet.addAll(Arrays.asList(reqTypes));
+            });
+        }
+
+
+        Set<String> responseTypesSet = new HashSet<>();
+        if (serviceDTO.getResponseType()!=null){
+            System.out.println(serviceDTO.getResponseType().size());
+            serviceDTO.getResponseType().forEach(s -> {
+                String[] reqTypes = StringUtils.split(s,",");
+                responseTypesSet.addAll(Arrays.asList(reqTypes));
+            });
+        }
+
+
+        System.out.println("RequestTypesSet :"+requestTypesSet);
+        System.out.println("ResponseTypesSet :"+responseTypesSet);
+
          return Service.builder()
                      .name(serviceDTO.getName())
                      .authorization(serviceDTO.getAuthorization())
-                     .requestType(serviceDTO.getRequestType())
+                     .requestType( new ArrayList<>(requestTypesSet))
                      .method(serviceDTO.getMethod())
                      .serviceParameters(serviceParameters)
                      .summary(serviceDTO.getSummary())
                      .endpoint(this.baseURL+ serviceDTO.getEndpoint())
-                     .responseType(serviceDTO.getResponseType())
+                     .responseType( new ArrayList<>(responseTypesSet))
                      .responseForInvalidRequest(serviceDTO.getResponseForInvalidRequest())
                  .build();
     }

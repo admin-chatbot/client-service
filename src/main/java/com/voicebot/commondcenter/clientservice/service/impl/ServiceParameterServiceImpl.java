@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +36,18 @@ public class ServiceParameterServiceImpl implements ServiceParameterService {
     public ServiceParameter save(ServiceParameter serviceParameter) {
         serviceParameter.setId(sequenceGeneratorService.generateSequence(ServiceParameter.SEQUENCE_NAME));
         return repository.save(serviceParameter);
+    }
+
+    @Override
+    public List<ServiceParameter> save(List<ServiceParameter> serviceParameters) {
+        if(serviceParameters==null) {
+            return  new ArrayList<>();
+        }
+
+        return serviceParameters.stream().map(serviceParameter -> {
+            serviceParameter.setId(sequenceGeneratorService.generateSequence(ServiceParameter.SEQUENCE_NAME));
+            return repository.save(serviceParameter);
+        }).toList();
     }
 
     @Override

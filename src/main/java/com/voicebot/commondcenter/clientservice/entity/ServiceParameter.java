@@ -3,24 +3,23 @@ package com.voicebot.commondcenter.clientservice.entity;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = "serviceparameters")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceParameter implements BaseEntity, Serializable {
+@CompoundIndex(name = "unq_name_in",def = "{ 'serviceId':1,'in': 1,'name':1}", unique = true)
+public class ServiceParameter extends AbstractBaseEntity implements Serializable {
 
     @Transient
     public static final String SEQUENCE_NAME = "serviceparameter_sequence";
@@ -48,13 +47,11 @@ public class ServiceParameter implements BaseEntity, Serializable {
 
     private String value;
 
-        private List<String> questionToGetInput;
+    private String jsonFormat;
+
+    private List<String> questionToGetInput;
 
     @Transient
     private Boolean questionAsked;
-
-
-
-
 
 }

@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.service.ApplicationService;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -49,10 +51,61 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     public ResponseEntity<?> onBoard(@RequestBody @Valid Application application){
         try {
-
-
-
             Optional<Client> client = clientService.findOne(application.getId());
+
+            Application application1 = applicationService.onBoard(application);
+            return ResponseEntity.ok(application1);
+        }catch (Exception exception) {
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
+    }
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = Application.class),
+                    mediaType = "application/json") }
+            ),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
+    public ResponseEntity<?> edit(@RequestBody @Valid Application application){
+        try {
+
+            if(application == null) {
+                return ResponseEntity.badRequest().body( ResponseBody.builder()
+                        .message("Application is null.")
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .build() );
+            }
+
+            if(application.getId() == null ){
+                return ResponseEntity.badRequest().body( ResponseBody.builder()
+                        .message("Application Id should not null.")
+                        .code(HttpStatus.PARTIAL_CONTENT.value())
+                        .build() );
+            }
+
+            Optional<Application> applicationFromDB = applicationService.findOne(application.getId());
+
+            if(applicationFromDB.isEmpty()) {
+                return ResponseEntity.badRequest().body( ResponseBody.builder()
+                        .message("Application Id is not valid.")
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .build() );
+            }
+            Optional<Client> client = clientService.findOne(application.getId());
+
+            if (client.isEmpty()) {
+                return ResponseEntity.badRequest().body( ResponseBody.builder()
+                        .message("Invalid client.")
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .build() );
+            }
 
             Application application1 = applicationService.onBoard(application);
             return ResponseEntity.ok(application1);

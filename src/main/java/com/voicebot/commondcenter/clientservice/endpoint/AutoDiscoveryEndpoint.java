@@ -6,7 +6,9 @@ import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
+import com.voicebot.commondcenter.clientservice.repository.ServiceParameterRepository;
 import com.voicebot.commondcenter.clientservice.service.AutoDiscoveryService;
+import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
 import com.voicebot.commondcenter.clientservice.service.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +37,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/service/")
 @CrossOrigin
 @Tag(name = "AutoDiscovery", description = "Auto Discovery Service APIs")
-public class AutoDiscoveryEndpoint {
+public class  AutoDiscoveryEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoDiscoveryEndpoint.class);
 
@@ -43,8 +46,8 @@ public class AutoDiscoveryEndpoint {
 
     @Autowired
     private ServiceService serviceService;
-
-
+    @Autowired
+    private ServiceParameterService serviceParameterService;
 
 
     @PostMapping(path = "discover/")
@@ -101,18 +104,25 @@ public class AutoDiscoveryEndpoint {
                             StringUtils.equalsIgnoreCase(s.getEndpoint(), r.getEndpoint())
                                     && StringUtils.equalsIgnoreCase(s.getMethod(), r.getMethod())
                                     && StringUtils.equalsIgnoreCase(s.getName(), r.getName())
-                    )).collect(Collectors.toList());
+                    )).toList();
 
             for (Service service: finalServices) {
                 ArrayList<ServiceParameter> serviceParameter = service.getServiceParameters();
-                Service result = serviceService.save(service);
+                service.setClientId(autoDiscoverServiceRequest.getServiceId());
+                service.setApplicationId(autoDiscoverServiceRequest.getApplicationId());
+                try {
+                    Service result = serviceService.save(service);
 
-                ArrayList<ServiceParameter> parameters = new ArrayList<>(serviceParameter.stream().map(sp -> {
-                    sp.setServiceId(result.getId());
-                    return sp;
-                }).collect(Collectors.toList()));
+                    ArrayList<ServiceParameter> parameters = serviceParameter.stream().map(sp -> {
+                        sp.setServiceId(result.getId());
+                        return sp;
+                    }).collect(Collectors.toCollection(ArrayList::new));
 
-                System.out.println(parameters);
+                    serviceParameterService.save(parameters);
+                }catch (DuplicateKeyException duplicateKeyException) {
+                    LOGGER.warn("Service is already registered with us. Service  : {}",service);
+                }
+
             }
 
             return ResponseEntity.ok(ResponseBody.builder().code(HttpStatus.OK.value()).message("Services is successfully onboarded.").build());

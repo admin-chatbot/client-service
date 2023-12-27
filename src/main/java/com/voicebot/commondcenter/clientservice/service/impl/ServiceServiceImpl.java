@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ServiceServiceImpl implements ServiceService {
@@ -30,6 +31,11 @@ public class ServiceServiceImpl implements ServiceService {
         service.setId(sequenceGeneratorService.generateSequence(com.voicebot.commondcenter.clientservice.entity.Service.SEQUENCE_NAME));
         service.setStatus(Status.NEW);
         return serviceRepository.save(service);
+    }
+
+    @Override
+    public Optional<com.voicebot.commondcenter.clientservice.entity.Service> fetchOne(Long serviceId) {
+        return serviceRepository.findById(serviceId);
     }
 
     @Override
