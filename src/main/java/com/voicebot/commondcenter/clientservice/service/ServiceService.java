@@ -14,9 +14,13 @@ public interface ServiceService {
     public List<Service> find();
     public Service save(Service service);
 
+    public Service edit(Service service);
+
     public Optional<Service> fetchOne(Long serviceId);
 
     List<Service> findAllByClientId(Long clientId);
+
+    List<Service> findAllByApplicationId(Long applicationId);
 
     List<Service> findServiceByClientIdAndKeywordLike(Long clientId,String keyword);
 }

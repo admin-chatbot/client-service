@@ -33,7 +33,17 @@ public class ApplicationServiceImpl implements ApplicationService {
     public Application onBoard(Application application) {
         application.setId(sequenceGeneratorService.generateSequence(Application.SEQUENCE_NAME));
         application.setRegisterDate(new Date(System.currentTimeMillis()));
+        application.setCreatedTimestamp(new Date(System.currentTimeMillis()));
+        application.setModifiedTimestamp(new Date(System.currentTimeMillis()));
         application.setStatus(Status.NEW);
+        return applicationRepository.save(application);
+    }
+
+    @Override
+    public Application edit(Application application) {
+        if(application!=null)
+            application.setModifiedTimestamp(new Date(System.currentTimeMillis()));
+        assert application != null;
         return applicationRepository.save(application);
     }
 

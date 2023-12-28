@@ -5,6 +5,7 @@ import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.service.ApplicationService;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
+import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
 import io.swagger.v3.core.util.OpenAPISchema2JsonSchema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.OpenAPI;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,8 @@ import java.util.Optional;
 @RequestMapping(path = "/api/v1/application/")
 @Tag(name = "Application", description = "Application management APIs")
 public class ApplicationEndpoint {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationEndpoint.class);
 
     @Autowired
     private ApplicationService applicationService;
@@ -74,6 +79,8 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     public ResponseEntity<?> edit(@RequestBody @Valid Application application){
+
+        LOGGER.info("edit, Application : {}",application);
         try {
 
             if(application == null) {
@@ -107,10 +114,15 @@ public class ApplicationEndpoint {
                         .build() );
             }
 
-            Application application1 = applicationService.onBoard(application);
+            Application application1 = applicationService.edit(application);
             return ResponseEntity.ok(application1);
         }catch (Exception exception) {
-            return ResponseEntity.internalServerError().body(exception.getMessage());
+            LOGGER.error(exception.getMessage(),exception);
+            return ResponseEntity.internalServerError().body(ResponseBody.builder()
+                    .message(exception.getMessage())
+                    .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .exception(exception)
+                    .build() );
         }
     }
 

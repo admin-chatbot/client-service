@@ -43,7 +43,6 @@ public class Application extends AbstractBaseEntity implements Serializable {
 
     private Date registerDate;
 
-    @NotBlank( message = "Status should nit null or empty.")
     private Status status;
 
     @NotNull(message = "Client Id should not null or empty.")

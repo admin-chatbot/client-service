@@ -67,6 +67,31 @@ public class ServiceEndpoint {
         }
     }
 
+    @GetMapping(path="byApplication/{id}")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getServiceByApplicationId(@PathVariable(name="id") Long id) {
+        try {
+            LOGGER.info("getServiceByApplicationId");
+            List<Service> services = serviceService.findAllByApplicationId(id);
+            return ResponseEntity.ok(services);
+        }catch (Exception exception){
+            LOGGER.error("",exception);
+            return ResponseEntity
+                    .internalServerError()
+                    .body(exception.getMessage());
+        }
+    }
+
 
     @GetMapping(path="{clientId}/keyword")
     @Operation(parameters = {
@@ -167,7 +192,7 @@ public class ServiceEndpoint {
                          .code(HttpStatus.BAD_REQUEST.value())
                          .build() );
              }
-            Service c =  serviceService.save(service);
+            Service c =  serviceService.edit(service);
             return ResponseEntity.ok(c);
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
