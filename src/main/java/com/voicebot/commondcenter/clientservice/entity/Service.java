@@ -1,12 +1,11 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import com.voicebot.commondcenter.clientservice.discovery.service.model.Authorization;
 import com.voicebot.commondcenter.clientservice.discovery.service.model.ResponseMessage;
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -15,7 +14,6 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 

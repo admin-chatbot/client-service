@@ -2,12 +2,13 @@ package com.voicebot.commondcenter.clientservice.entity;
 
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.util.Date;
+
 
 @Data
 public class AbstractBaseEntity implements BaseEntity {
 
-    public Timestamp createdTimestamp;
+    public Date createdTimestamp;
 
-    public Timestamp modifiedTimestamp;
+    public Date modifiedTimestamp;
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +36,16 @@ public class ServiceParameterServiceImpl implements ServiceParameterService {
     @Override
     public ServiceParameter save(ServiceParameter serviceParameter) {
         serviceParameter.setId(sequenceGeneratorService.generateSequence(ServiceParameter.SEQUENCE_NAME));
+        serviceParameter.setCreatedTimestamp(new Date(System.currentTimeMillis()));
+        serviceParameter.setModifiedTimestamp(new Date(System.currentTimeMillis()));
+        return repository.save(serviceParameter);
+    }
+
+    @Override
+    public ServiceParameter edit(ServiceParameter serviceParameter) {
+        if(serviceParameter!=null)
+            serviceParameter.setModifiedTimestamp(new Date(System.currentTimeMillis()));
+        assert serviceParameter != null;
         return repository.save(serviceParameter);
     }
 

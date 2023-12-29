@@ -16,6 +16,8 @@ public interface ApplicationService {
 
     public Application onBoard(Application application);
 
+    public Application edit(Application application);
+
     public List<Application> find();
 
     public Page<Application> find(Pageable pageable);

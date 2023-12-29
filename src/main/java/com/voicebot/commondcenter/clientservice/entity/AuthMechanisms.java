@@ -7,10 +7,9 @@ import java.util.Map;
 
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthMechanisms extends AbstractBaseEntity implements Serializable {
+public class AuthMechanisms  implements Serializable {
 
     private String Type;
     private Map<String, String> parameters;

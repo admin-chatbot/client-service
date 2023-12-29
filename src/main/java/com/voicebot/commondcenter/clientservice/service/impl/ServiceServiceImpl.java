@@ -8,6 +8,7 @@ import com.voicebot.commondcenter.clientservice.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,16 @@ public class ServiceServiceImpl implements ServiceService {
     public com.voicebot.commondcenter.clientservice.entity.Service save(com.voicebot.commondcenter.clientservice.entity.Service service) {
         service.setId(sequenceGeneratorService.generateSequence(com.voicebot.commondcenter.clientservice.entity.Service.SEQUENCE_NAME));
         service.setStatus(Status.NEW);
+        service.setCreatedTimestamp(new Date(System.currentTimeMillis()));
+        service.setModifiedTimestamp(new Date(System.currentTimeMillis()));
+        return serviceRepository.save(service);
+    }
+
+    @Override
+    public com.voicebot.commondcenter.clientservice.entity.Service edit(com.voicebot.commondcenter.clientservice.entity.Service service) {
+        if(service!=null)
+            service.setModifiedTimestamp(new Date(System.currentTimeMillis()));
+        assert service != null;
         return serviceRepository.save(service);
     }
 
@@ -41,6 +52,11 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public List<com.voicebot.commondcenter.clientservice.entity.Service> findAllByClientId(Long clientId) {
         return serviceRepository.findServicesByClientId(clientId);
+    }
+
+    @Override
+    public List<com.voicebot.commondcenter.clientservice.entity.Service> findAllByApplicationId(Long applicationId) {
+        return serviceRepository.findServiceByApplicationId(applicationId);
     }
 
     @Override

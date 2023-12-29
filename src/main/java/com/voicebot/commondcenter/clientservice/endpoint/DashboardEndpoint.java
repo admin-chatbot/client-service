@@ -27,6 +27,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/dashboard/" )
+@CrossOrigin
 @Tag(name = "Dashboard", description = "Dashboard Management APIs")
 public class DashboardEndpoint {
 
