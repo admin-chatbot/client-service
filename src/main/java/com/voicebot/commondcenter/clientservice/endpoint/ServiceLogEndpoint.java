@@ -18,11 +18,14 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/service/log/" )
@@ -50,7 +53,11 @@ public class ServiceLogEndpoint {
         try {
             LOGGER.info("serviceLog {} ",serviceLog);
             ServiceLog c =  serviceLogService.save(serviceLog);
-            return ResponseEntity.ok(c);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Logged.")
+                    .code(HttpStatus.OK.value())
+                    .data(c)
+                    .build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return build500(exception);
@@ -70,7 +77,13 @@ public class ServiceLogEndpoint {
     })
     public ResponseEntity<?> get() {
         try {
-            return ResponseEntity.ok(serviceLogService.get());
+            List<ServiceLog> serviceLogs =  serviceLogService.get();
+
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Logs found. "+String.valueOf(serviceLogs.size()))
+                    .code(HttpStatus.OK.value())
+                    .data(serviceLogs)
+                    .build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return build500(exception);
@@ -90,7 +103,13 @@ public class ServiceLogEndpoint {
     })
     public ResponseEntity<?> get(Pageable pageable) {
         try {
-            return ResponseEntity.ok(serviceLogService.get(pageable));
+            Page<ServiceLog> serviceLogPage = serviceLogService.get(pageable);
+
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Logs found.")
+                    .code(HttpStatus.OK.value())
+                    .data(serviceLogPage)
+                    .build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return build500(exception);

@@ -2,7 +2,9 @@ package com.voicebot.commondcenter.clientservice.service.impl;
 
 import com.voicebot.commondcenter.clientservice.dto.ServiceCountDto;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
+import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
 import com.voicebot.commondcenter.clientservice.repository.ServiceLogRepository;
+import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.ServiceLogService;
 import org.springframework.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,8 +28,14 @@ public class ServiceLogServiceImpl implements ServiceLogService {
     @Autowired
     private ServiceLogRepository serviceLogRepository;
 
+    @Autowired
+    SequenceGeneratorService sequenceGeneratorService;
+
     @Override
     public ServiceLog save(ServiceLog serviceLog) {
+        serviceLog.setId(sequenceGeneratorService.generateSequence(ServiceLog.SEQUENCE_NAME));
+        serviceLog.setCreatedTimestamp(new Date(System.currentTimeMillis()));
+        serviceLog.setModifiedTimestamp(new Date(System.currentTimeMillis()));
         return serviceLogRepository.save(serviceLog);
     }
 

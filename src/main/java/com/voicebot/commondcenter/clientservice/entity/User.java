@@ -1,6 +1,7 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 
+import com.voicebot.commondcenter.clientservice.enums.AccessType;
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -42,8 +43,9 @@ public class User extends AbstractBaseEntity implements Serializable {
     private String mobileNumber;
 
     @NotBlank( message = "Email should not null or empty.")
-    @Email(message = "Invalid email address.")
     private String empId;
+
+    private AccessType accessType;
 
     private Date registrationDate;
 
