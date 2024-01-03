@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Data
 @Builder
-public class ResponseBody<I extends Serializable>  {
+public class ResponseBody<I extends Object>  {
 
     private int code;
 

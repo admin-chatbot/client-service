@@ -1,6 +1,7 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 
+import com.voicebot.commondcenter.clientservice.enums.ServiceLogStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -34,7 +35,11 @@ public class ServiceLog extends AbstractBaseEntity implements  Serializable {
 
     private List<ServiceParameter> parameters;
 
-    @NotNull( message = "Name should not null or empty.")
+    private String method;
+
+    private ServiceLogStatus status;
+
+    @NotNull( message = "Client should not null or empty.")
     private Long client;
 
     @NotNull( message = "Application Id should not null or empty.")

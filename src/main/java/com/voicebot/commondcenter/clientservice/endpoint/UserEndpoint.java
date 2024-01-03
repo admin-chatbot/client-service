@@ -86,7 +86,11 @@ public class UserEndpoint {
             }
 
             User u =  userService.save(user);
-            return ResponseEntity.ok(u);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Successfully registered with us.")
+                    .code(HttpStatus.OK.value())
+                    .data(u)
+                    .build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()
@@ -156,7 +160,11 @@ public class UserEndpoint {
         try {
             LOGGER.info("getAllServiceByClientId");
             List<User> users = userService.findUsersByClientId(clientId);
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(users!=null? String.valueOf(users.size()) :0+" user found.")
+                    .code(HttpStatus.OK.value())
+                    .data(users)
+                    .build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -207,7 +215,11 @@ public class UserEndpoint {
         try {
             LOGGER.info("getAllServiceByClientId");
             List<User> users = userService.getRepository().findAll();
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(String.valueOf(users.size()))
+                    .code(HttpStatus.OK.value())
+                    .data(users)
+                    .build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
