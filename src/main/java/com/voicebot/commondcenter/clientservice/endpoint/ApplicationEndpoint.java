@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -140,6 +141,31 @@ public class ApplicationEndpoint {
     public ResponseEntity<?> getAllApplication() {
         try {
             return ResponseEntity.ok(applicationService.find());
+        }catch (Exception exception) {
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> getAllApplicationByClientId(@PathVariable(name = "id") Long clientId) {
+        try {
+            List<Application> applications = applicationService.findByClint(clientId);
+
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(applications!=null? String.valueOf(applications.size()) :0+" application found.")
+                    .code(HttpStatus.OK.value())
+                    .data(applications)
+                    .build());
         }catch (Exception exception) {
             return ResponseEntity.internalServerError().body(exception.getMessage());
         }
