@@ -118,7 +118,7 @@ public class  AutoDiscoveryEndpoint {
                         return sp;
                     }).collect(Collectors.toCollection(ArrayList::new));
 
-                    serviceParameterService.save(parameters);
+                     serviceParameterService.save(parameters);
                 }catch (DuplicateKeyException duplicateKeyException) {
                     LOGGER.warn("Service is already registered with us. Service  : {}",service);
                 }

@@ -12,7 +12,6 @@ import java.io.Serializable;
 public class ResponseBody<I extends Object>  {
 
     private int code;
-
     private String message;
 
     private I data;

@@ -41,8 +41,12 @@ public class AuthenticationEndpoint {
     })
     private ResponseEntity<?> register(@Valid @RequestBody Client client) {
         try {
-            clientService.register(client);
-            return  ResponseEntity.ok().body("Client is successfully registered with us.");
+           Client registeredClient =   clientService.register(client);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Client is successfully registered with us.")
+                    .code(HttpStatus.OK.value())
+                    .data(registeredClient)
+                    .build());
         }catch (EmailAlreadyRegistered emailAlreadyRegistered) {
             return  ResponseEntity.badRequest().body(emailAlreadyRegistered.getMessage());
         }

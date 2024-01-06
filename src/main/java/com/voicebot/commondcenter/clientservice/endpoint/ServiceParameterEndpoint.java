@@ -60,7 +60,13 @@ public class ServiceParameterEndpoint {
 
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("ServiceParameter List {}",services);
-            return ResponseEntity.ok(services);
+
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(String.valueOf(services.size()))
+                    .code(HttpStatus.OK.value())
+                    .data(services)
+                    .build());
+
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -90,7 +96,12 @@ public class ServiceParameterEndpoint {
 
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("ServiceParameter List {}",services);
-            return ResponseEntity.ok(services);
+
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(String.valueOf(services.size()))
+                    .code(HttpStatus.OK.value())
+                    .data(services)
+                    .build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -130,7 +141,7 @@ public class ServiceParameterEndpoint {
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("Inserted successfully. ServiceParameter {}",c);
 
-            return ResponseEntity.ok(c);
+            return ResponseEntity.ok(ResponseBody.builder().data(c).message("Parameter successfully added.").code(HttpStatus.OK.value()).build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()
@@ -185,7 +196,7 @@ public class ServiceParameterEndpoint {
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("Inserted successfully. ServiceParameter {}",c);
 
-            return ResponseEntity.ok(c);
+            return ResponseEntity.ok(ResponseBody.builder().data(c).message("Parameter successfully added.").code(HttpStatus.OK.value()).build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()

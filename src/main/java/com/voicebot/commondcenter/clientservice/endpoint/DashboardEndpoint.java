@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.dto.DashboardDto;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
@@ -51,7 +52,9 @@ public class DashboardEndpoint {
     })
     public ResponseEntity<?> getAllApplication() {
         try {
-            return ResponseEntity.ok(dashboardService.getDashboard());
+            DashboardDto dashboardDto = dashboardService.getDashboard();
+
+            return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
         }catch (Exception exception) {
             exception.printStackTrace();
             return ResponseEntity.internalServerError().body(exception.getMessage());
@@ -72,7 +75,8 @@ public class DashboardEndpoint {
     })
     public ResponseEntity<?> getDashboardByClientId(@PathVariable(name="clintId") Long clintId) {
         try {
-            return ResponseEntity.ok(dashboardService.getDashboardByClintId(clintId));
+            DashboardDto dashboardDto = dashboardService.getDashboardByClintId(clintId);
+            return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
