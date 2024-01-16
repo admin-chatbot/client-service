@@ -58,7 +58,11 @@ public class ServiceEndpoint {
         try {
             LOGGER.info("getAllServiceByClientId");
             List<Service> services = serviceService.findAllByClientId(clientId);
-            return ResponseEntity.ok(services);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(services!=null? String.valueOf(services.size()) :0+" services found.")
+                    .code(HttpStatus.OK.value())
+                    .data(services)
+                    .build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -83,7 +87,11 @@ public class ServiceEndpoint {
         try {
             LOGGER.info("getServiceByApplicationId");
             List<Service> services = serviceService.findAllByApplicationId(id);
-            return ResponseEntity.ok(services);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(services!=null? String.valueOf(services.size()) :0+" services found.")
+                    .code(HttpStatus.OK.value())
+                    .data(services)
+                    .build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -116,7 +124,11 @@ public class ServiceEndpoint {
             }
 
             List<Service> services = serviceService.findServiceByClientIdAndKeywordLike(clientId,keyword);
-            return ResponseEntity.ok(services);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(services!=null? String.valueOf(services.size()) :0+" services found.")
+                    .code(HttpStatus.OK.value())
+                    .data(services)
+                    .build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()
@@ -143,7 +155,11 @@ public class ServiceEndpoint {
         try {
             LOGGER.info("Client {} ",service);
             Service c =  serviceService.save(service);
-            return ResponseEntity.ok(c);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("")
+                    .code(HttpStatus.OK.value())
+                    .data(c)
+                    .build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()
@@ -193,7 +209,7 @@ public class ServiceEndpoint {
                          .build() );
              }
             Service c =  serviceService.edit(service);
-            return ResponseEntity.ok(c);
+            return ResponseEntity.ok(ResponseBody.builder().data(c).message("Service successfully updated.").code(HttpStatus.OK.value()).build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()

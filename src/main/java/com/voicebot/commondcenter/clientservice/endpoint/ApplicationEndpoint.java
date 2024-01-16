@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,7 +61,11 @@ public class ApplicationEndpoint {
             Optional<Client> client = clientService.findOne(application.getId());
 
             Application application1 = applicationService.onBoard(application);
-            return ResponseEntity.ok(application1);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Application successfully onboard.")
+                    .code(HttpStatus.OK.value())
+                    .data(application1)
+                    .build());
         }catch (Exception exception) {
             return ResponseEntity.internalServerError().body(exception.getMessage());
         }
@@ -116,7 +121,12 @@ public class ApplicationEndpoint {
             }
 
             Application application1 = applicationService.edit(application);
-            return ResponseEntity.ok(application1);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Application successfully updated.")
+                    .code(HttpStatus.OK.value())
+                    .data(application1)
+                    .build());
+
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body(ResponseBody.builder()
@@ -140,7 +150,12 @@ public class ApplicationEndpoint {
     })
     public ResponseEntity<?> getAllApplication() {
         try {
-            return ResponseEntity.ok(applicationService.find());
+            List<Application> applications = applicationService.find();
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(applications!=null? String.valueOf(applications.size()) :0+" application found.")
+                    .code(HttpStatus.OK.value())
+                    .data(applications)
+                    .build());
         }catch (Exception exception) {
             return ResponseEntity.internalServerError().body(exception.getMessage());
         }
@@ -184,8 +199,12 @@ public class ApplicationEndpoint {
     })
     public ResponseEntity<?> getAllApplication(Pageable pageable) {
         try {
-
-            return ResponseEntity.ok(applicationService.find(pageable));
+            Page<Application> applications = applicationService.find(pageable);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("")
+                    .code(HttpStatus.OK.value())
+                    .data(applications)
+                    .build());
         }catch (Exception exception) {
             return ResponseEntity.internalServerError().body(exception.getMessage());
         }

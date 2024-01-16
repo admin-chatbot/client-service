@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.enums.Status;
@@ -49,7 +50,8 @@ public class ClientEndpoint {
     public ResponseEntity<?> getAllClient() {
         try {
             List<Client> clients = clientService.findAll();
-            return ResponseEntity.ok(clients);
+
+            return ResponseEntity.ok(ResponseBody.builder().data(clients).message(clients!=null? String.valueOf(clients.size()):"0"+ " clients found.").build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -69,7 +71,7 @@ public class ClientEndpoint {
             LOGGER.info("Client {} ",client);
             client.setStatus(Status.NEW);
             Client c =  clientService.register(client);
-            return ResponseEntity.ok(c);
+            return ResponseEntity.ok(ResponseBody.builder().data(c).message("Client is successfully onboarded.").build());
         }catch (Exception exception) {
             LOGGER.error("",exception);
             return ResponseEntity
