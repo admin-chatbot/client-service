@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.service;
 
+import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.repository.ApplicationRepository;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,15 @@ public interface ApplicationService {
 
 
     public List<Application> findByClint(Long id);
+
     public Page<Application> findByClient(Pageable pageable, Long id);
+
+    public Optional<Application> findApplicationByName(String name);
+
+    public Page<Application> search(Application application,Pageable pageable);
+
+    public List<Application> search(Application application);
+    public List<Application> search(ApplicationSearchRequest applicationSearchRequest);
 
 
 }

@@ -21,6 +21,16 @@ public class ResponseBuilder {
                 .build());
     }
 
+    public static <I> ResponseEntity<?> ok(String message, I i) {
+        return ResponseEntity.ok(ResponseBody.builder()
+                .message(message)
+                .code(HttpStatus.OK.value())
+                .data(i)
+                .build());
+    }
+
+
+
     public static ResponseEntity<?>  build404(String message) {
         return  ResponseEntity.notFound().build() ;
     }

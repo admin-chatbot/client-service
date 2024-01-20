@@ -1,11 +1,13 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.service.ApplicationService;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
+import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import io.swagger.v3.core.util.OpenAPISchema2JsonSchema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.OpenAPI;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,16 +61,25 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     public ResponseEntity<?> onBoard(@RequestBody @Valid Application application){
         try {
+
+
+            Optional<Application> alreadyPresent = applicationService.findApplicationByName(application.getName());
+            if(alreadyPresent.isEmpty()) {
+                return ResponseBuilder.build400("Application is already onboarded.");
+            }
+
             Optional<Client> client = clientService.findOne(application.getId());
 
+            if(client.isEmpty()) {
+                return ResponseBuilder.build400("Invalid Client.");
+            }
+
             Application application1 = applicationService.onBoard(application);
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message("Application successfully onboard.")
-                    .code(HttpStatus.OK.value())
-                    .data(application1)
-                    .build());
+
+            return ResponseBuilder.ok("Application successfully onboard.",application1);
+
         }catch (Exception exception) {
-            return ResponseEntity.internalServerError().body(exception.getMessage());
+            return ResponseBuilder.build500(exception);
         }
     }
 
@@ -90,50 +102,31 @@ public class ApplicationEndpoint {
         try {
 
             if(application == null) {
-                return ResponseEntity.badRequest().body( ResponseBody.builder()
-                        .message("Application is null.")
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .build() );
+                return ResponseBuilder.build400("Application is null.");
             }
 
             if(application.getId() == null ){
-                return ResponseEntity.badRequest().body( ResponseBody.builder()
-                        .message("Application Id should not null.")
-                        .code(HttpStatus.PARTIAL_CONTENT.value())
-                        .build() );
+                return ResponseBuilder.build400("Application Id should not null.");
             }
 
             Optional<Application> applicationFromDB = applicationService.findOne(application.getId());
 
             if(applicationFromDB.isEmpty()) {
-                return ResponseEntity.badRequest().body( ResponseBody.builder()
-                        .message("Application Id is not valid.")
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .build() );
+                return ResponseBuilder.build400("Application Id is not valid.");
             }
             Optional<Client> client = clientService.findOne(application.getId());
 
             if (client.isEmpty()) {
-                return ResponseEntity.badRequest().body( ResponseBody.builder()
-                        .message("Invalid client.")
-                        .code(HttpStatus.BAD_REQUEST.value())
-                        .build() );
+                return ResponseBuilder.build400("Invalid client.");
             }
 
             Application application1 = applicationService.edit(application);
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message("Application successfully updated.")
-                    .code(HttpStatus.OK.value())
-                    .data(application1)
-                    .build());
+
+            return ResponseBuilder.ok("Application successfully updated.",application1);
 
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
-            return ResponseEntity.internalServerError().body(ResponseBody.builder()
-                    .message(exception.getMessage())
-                    .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .exception(exception)
-                    .build() );
+            return ResponseBuilder.build500(exception);
         }
     }
 
@@ -152,12 +145,12 @@ public class ApplicationEndpoint {
         try {
             List<Application> applications = applicationService.find();
             return ResponseEntity.ok(ResponseBody.builder()
-                    .message(applications!=null? String.valueOf(applications.size()) :0+" application found.")
+                    .message( (applications!=null? String.valueOf(applications.size()) : String.valueOf(0)) )
                     .code(HttpStatus.OK.value())
                     .data(applications)
                     .build());
         }catch (Exception exception) {
-            return ResponseEntity.internalServerError().body(exception.getMessage());
+            return ResponseBuilder.build500(exception);
         }
     }
 
@@ -182,7 +175,7 @@ public class ApplicationEndpoint {
                     .data(applications)
                     .build());
         }catch (Exception exception) {
-            return ResponseEntity.internalServerError().body(exception.getMessage());
+            return ResponseBuilder.build500(exception);
         }
     }
 
@@ -206,7 +199,54 @@ public class ApplicationEndpoint {
                     .data(applications)
                     .build());
         }catch (Exception exception) {
-            return ResponseEntity.internalServerError().body(exception.getMessage());
+            return ResponseBuilder.build500(exception);
         }
     }
+
+
+    @GetMapping( path = "search/{keyword}/" )
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Pageable.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> search(Pageable pageable) {
+        try {
+            Application application = Application.builder().build();
+            FieldUtils.writeDeclaredField(application,"name","jitendra",true);
+            FieldUtils.writeDeclaredField(application,"clintId","1",true);
+            System.out.println(application);
+            return ResponseBuilder.ok("",null);
+        }catch (Exception exception) {
+            return ResponseBuilder.build500(exception);
+        }
+    }
+
+    @PostMapping( path = "search/" )
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Pageable.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseEntity.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> search(@RequestBody ApplicationSearchRequest searchRequest ) {
+        try {
+            List<Application> applications =  applicationService.search(searchRequest);
+            return ResponseBuilder.ok("",applications);
+        }catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseBuilder.build500(exception);
+        }
+    }
+
+
 }
