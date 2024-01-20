@@ -17,4 +17,6 @@ public interface ApplicationRepository extends MongoRepository<Application, Long
     public List<Application> findApplicationsByClintId(Long clintId);
 
     public Page<Application> findApplicationsByClintId(Long clintId, Pageable pageable);
+
+
 }
