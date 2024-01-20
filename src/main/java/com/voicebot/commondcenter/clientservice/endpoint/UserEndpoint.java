@@ -1,10 +1,14 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
 
+import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
+import com.voicebot.commondcenter.clientservice.dto.UserSearchRequest;
+import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.entity.User;
 import com.voicebot.commondcenter.clientservice.service.UserService;
+import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -252,4 +256,26 @@ public class UserEndpoint {
                     .body(exception.getMessage());
         }
     }
+
+    @PostMapping( path = "search/" )
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Pageable.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseEntity.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> search(@RequestBody UserSearchRequest searchRequest ) {
+        try {
+            List<User> users =  userService.search(searchRequest);
+            return ResponseBuilder.ok("",users);
+        }catch (Exception exception) {
+            exception.printStackTrace();
+            return ResponseBuilder.build500(exception);
+        }
+    }
+
 }
