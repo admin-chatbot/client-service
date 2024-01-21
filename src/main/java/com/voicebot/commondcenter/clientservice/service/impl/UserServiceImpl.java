@@ -10,6 +10,7 @@ import com.voicebot.commondcenter.clientservice.repository.UserRepository;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -97,5 +98,9 @@ public class UserServiceImpl implements UserService {
         Query query
                 = new Query(root);
         return mongoTemplate.find(query, User.class);
+    }
+
+    public List<User> findByExample(Example<User> userExample) {
+        return userRepository.findAll(userExample);
     }
 }

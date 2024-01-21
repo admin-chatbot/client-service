@@ -5,6 +5,7 @@ import com.voicebot.commondcenter.clientservice.dto.UserSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.User;
 import com.voicebot.commondcenter.clientservice.repository.UserRepository;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,4 +35,6 @@ public interface UserService {
     public Optional<User> findUserByEmpId(String empId);
 
     public List<User> search(UserSearchRequest userSearchRequest);
+
+    public List<User> findByExample(Example<User> userExample);
 }
