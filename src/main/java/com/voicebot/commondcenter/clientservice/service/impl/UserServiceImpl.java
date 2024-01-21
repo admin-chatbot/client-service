@@ -1,13 +1,20 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
+import com.voicebot.commondcenter.clientservice.dto.UserSearchRequest;
+import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.User;
 import com.voicebot.commondcenter.clientservice.enums.Status;
+import com.voicebot.commondcenter.clientservice.filter.CriteriaBuilder;
+import com.voicebot.commondcenter.clientservice.filter.SearchCriteria;
 import com.voicebot.commondcenter.clientservice.repository.UserRepository;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -22,6 +29,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     SequenceGeneratorService sequenceGeneratorService;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public UserRepository getRepository() {
@@ -73,5 +83,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findUserByEmpId(String empId) {
         return userRepository.findUserByEmpId(empId);
+    }
+
+    @Override
+    public List<User> search(UserSearchRequest userSearchRequest) {
+        Criteria root =   new CriteriaBuilder()
+                .addCriteria(new SearchCriteria("empId","eq", userSearchRequest.getEmpId(),""))
+                .addCriteria(new SearchCriteria("name","eq", userSearchRequest.getName(),""))
+                .addCriteria(new SearchCriteria("mobile","eq", userSearchRequest.getMobile(),"" ))
+                .addCriteria(new SearchCriteria("access", "eq", userSearchRequest.getAccess(), ""))
+                .addCriteria(new SearchCriteria("status", "eq", userSearchRequest.getStatus()))
+                .build();
+        Query query
+                = new Query(root);
+        return mongoTemplate.find(query, User.class);
     }
 }
