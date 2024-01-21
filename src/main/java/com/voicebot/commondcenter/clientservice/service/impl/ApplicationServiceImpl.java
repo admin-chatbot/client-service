@@ -73,6 +73,8 @@ public class ApplicationServiceImpl implements ApplicationService, BaseService<A
         return applicationRepository.findAll(pageable);
     }
 
+
+
     @Override
     public Optional<Application> findOne(Long id) {
         return applicationRepository.findById(id);
@@ -124,7 +126,7 @@ public class ApplicationServiceImpl implements ApplicationService, BaseService<A
 
     @Override
     public List<Application> search(ApplicationSearchRequest applicationSearchRequest) {
-    Criteria root =   new CriteriaBuilder()
+    Criteria root = new CriteriaBuilder()
                 .addCriteria(new SearchCriteria("name","eq", applicationSearchRequest.getName(),""))
                 .addCriteria(new SearchCriteria("purpose","eq", applicationSearchRequest.getPurpose(),""))
                 //.addCriteria(new SearchCriteria("registerDate","btn","",applicationSearchRequest.getFromDate(),applicationSearchRequest.getToDate()))

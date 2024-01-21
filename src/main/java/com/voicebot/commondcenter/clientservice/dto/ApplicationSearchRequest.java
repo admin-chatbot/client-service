@@ -17,7 +17,6 @@ public class ApplicationSearchRequest {
    private Date  fromDate;
    private String status;
 
-
    public Application build() {
       return null;
    }
