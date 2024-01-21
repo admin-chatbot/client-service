@@ -3,6 +3,7 @@ package com.voicebot.commondcenter.clientservice.service;
 import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.repository.ApplicationRepository;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public interface ApplicationService {
     public List<Application> find();
 
     public Page<Application> find(Pageable pageable);
+
+
 
     public Optional<Application> findOne(Long id);
 
