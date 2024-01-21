@@ -1,5 +1,8 @@
 package com.voicebot.commondcenter.clientservice.service;
 
+import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
+import com.voicebot.commondcenter.clientservice.dto.UserSearchRequest;
+import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.User;
 import com.voicebot.commondcenter.clientservice.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -29,4 +32,6 @@ public interface UserService {
     public Optional<User> findById(Long id);
 
     public Optional<User> findUserByEmpId(String empId);
+
+    public List<User> search(UserSearchRequest userSearchRequest);
 }
