@@ -7,6 +7,7 @@ import com.voicebot.commondcenter.clientservice.dto.UserSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.entity.User;
+import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.service.UserService;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -274,6 +276,35 @@ public class UserEndpoint {
             return ResponseBuilder.ok("",users);
         }catch (Exception exception) {
             exception.printStackTrace();
+            return ResponseBuilder.build500(exception);
+        }
+    }
+
+    @GetMapping("/byClient/{id}/status/{status}")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> getAllApplicationByClientIdAndStatus(@PathVariable(name = "id") Long clientId,
+                                                                  @PathVariable(name = "status") Status status) {
+        try {
+
+            User user = User.builder().clientId(clientId).status(status).build();
+            Example<User> userExample = Example.of(user);
+
+            List<User> users = userService.findByExample(userExample);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message(users!=null? String.valueOf(users.size()) :0+" user found.")
+                    .code(HttpStatus.OK.value())
+                    .data(users)
+                    .build());
+        }catch (Exception exception) {
             return ResponseBuilder.build500(exception);
         }
     }
