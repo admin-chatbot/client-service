@@ -66,16 +66,17 @@ public class ApplicationEndpoint {
         try {
 
 
-            Optional<Application> alreadyPresent = applicationService.findApplicationByName(application.getName());
-            if(alreadyPresent.isEmpty()) {
+            Optional<Client> client = clientService.findOne(application.getClintId());
+
+            if(client.isEmpty()) {
+                return ResponseBuilder.build400("Invalid Client.");            }
+
+            Optional<Application> alreadyPresent = applicationService.findApplicationByClientAndName(application.getClintId(),application.getName());
+            if(alreadyPresent.isPresent()) {
                 return ResponseBuilder.build400("Application is already onboarded.");
             }
 
-            Optional<Client> client = clientService.findOne(application.getId());
 
-            if(client.isEmpty()) {
-                return ResponseBuilder.build400("Invalid Client.");
-            }
 
             Application application1 = applicationService.onBoard(application);
 
@@ -117,7 +118,7 @@ public class ApplicationEndpoint {
             if(applicationFromDB.isEmpty()) {
                 return ResponseBuilder.build400("Application Id is not valid.");
             }
-            Optional<Client> client = clientService.findOne(application.getId());
+            Optional<Client> client = clientService.findOne(application.getClintId());
 
             if (client.isEmpty()) {
                 return ResponseBuilder.build400("Invalid client.");

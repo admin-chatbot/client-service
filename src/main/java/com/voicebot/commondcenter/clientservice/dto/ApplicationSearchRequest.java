@@ -16,6 +16,7 @@ public class ApplicationSearchRequest {
    private Date toDate;
    private Date  fromDate;
    private String status;
+   private Long clientId;
 
    public Application build() {
       return null;

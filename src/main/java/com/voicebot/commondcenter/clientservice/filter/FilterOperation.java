@@ -14,7 +14,10 @@ public enum FilterOperation {
     IN("in"),
     NOT_IN("nin"),
     BETWEEN("btn"),
-    CONTAINS("like");
+    CONTAINS("like"),
+    START_WITH("sw"),
+    END_WITH("nw");
+
 
     private String value;
 

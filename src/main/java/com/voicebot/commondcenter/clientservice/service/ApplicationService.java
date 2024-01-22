@@ -35,6 +35,8 @@ public interface ApplicationService {
 
     public Optional<Application> findApplicationByName(String name);
 
+    public Optional<Application> findApplicationByClientAndName(Long clientId,String name);
+
     public Page<Application> search(Application application,Pageable pageable);
 
     public List<Application> search(Application application);
