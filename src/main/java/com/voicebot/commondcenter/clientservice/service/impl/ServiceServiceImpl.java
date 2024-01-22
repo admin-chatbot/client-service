@@ -1,12 +1,19 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
 
+import com.voicebot.commondcenter.clientservice.dto.ServiceSearchRequest;
 import com.voicebot.commondcenter.clientservice.enums.Status;
+import com.voicebot.commondcenter.clientservice.filter.CriteriaBuilder;
+import com.voicebot.commondcenter.clientservice.filter.SearchCriteria;
 import com.voicebot.commondcenter.clientservice.repository.ServiceRepository;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+
 
 import java.util.Date;
 import java.util.List;
@@ -21,6 +28,8 @@ public class ServiceServiceImpl implements ServiceService {
     @Autowired
     SequenceGeneratorService sequenceGeneratorService;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public List<com.voicebot.commondcenter.clientservice.entity.Service> find() {
@@ -62,5 +71,18 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public List<com.voicebot.commondcenter.clientservice.entity.Service> findServiceByClientIdAndKeywordLike(Long clientId, String keyword) {
         return serviceRepository.findServicesByClientIdAndKeywordLike(clientId, keyword);
+    }
+
+    @Override
+    public List<com.voicebot.commondcenter.clientservice.entity.Service> search(ServiceSearchRequest serviceSearchRequest) {
+        Criteria root =   new CriteriaBuilder()
+                .addCriteria(new SearchCriteria("name","eq",serviceSearchRequest.getName(),""))
+                .addCriteria(new SearchCriteria("endPoint","eq", serviceSearchRequest.getEndPoint(),""))
+                .addCriteria(new SearchCriteria("method","eq", serviceSearchRequest.getMethod(),"" ))
+                .build();
+        Query query
+                = new Query(root);
+        return mongoTemplate.find(query, com.voicebot.commondcenter.clientservice.entity.Service.class);
+        //return null;
     }
 }
