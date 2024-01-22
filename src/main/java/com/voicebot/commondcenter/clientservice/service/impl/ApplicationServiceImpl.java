@@ -10,6 +10,7 @@ import com.voicebot.commondcenter.clientservice.repository.ApplicationRepository
 import com.voicebot.commondcenter.clientservice.service.ApplicationService;
 import com.voicebot.commondcenter.clientservice.service.BaseService;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
+import org.apache.commons.lang3.StringUtils;
 import org.mozilla.javascript.ast.NewExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -19,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
+import org.springframework.data.mongodb.core.query.MongoRegexCreator;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.query.parser.Part;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -99,6 +102,12 @@ public class ApplicationServiceImpl implements ApplicationService, BaseService<A
     }
 
     @Override
+    public Optional<Application> findApplicationByClientAndName(Long clientId, String name) {
+        Example<Application> applicationExample = Example.of(Application.builder().clintId(clientId).name(name).build());
+        return findOneByExample(applicationExample);
+    }
+
+    @Override
     public List<Application> findByExample(Example<Application> applicationExample) {
         return applicationRepository.findAll(applicationExample);
     }
@@ -126,14 +135,39 @@ public class ApplicationServiceImpl implements ApplicationService, BaseService<A
 
     @Override
     public List<Application> search(ApplicationSearchRequest applicationSearchRequest) {
-    Criteria root = new CriteriaBuilder()
-                .addCriteria(new SearchCriteria("name","eq", applicationSearchRequest.getName(),""))
-                .addCriteria(new SearchCriteria("purpose","eq", applicationSearchRequest.getPurpose(),""))
-                //.addCriteria(new SearchCriteria("registerDate","btn","",applicationSearchRequest.getFromDate(),applicationSearchRequest.getToDate()))
-                .build();
+
+
+
+        CriteriaBuilder criteriaBuilder = new CriteriaBuilder();
+
+        if(applicationSearchRequest==null)
+            return null;
+
+        if(applicationSearchRequest.getClientId()!=null
+                && applicationSearchRequest.getClientId() > 0)
+            criteriaBuilder.addCriteria(new SearchCriteria("clintId","eq", applicationSearchRequest.getClientId(),""));
+
+        if(!StringUtils.isBlank(applicationSearchRequest.getName())) {
+            criteriaBuilder.addCriteria(new SearchCriteria("name", "like", applicationSearchRequest.getName(), ""));
+        }
+        if(!StringUtils.isBlank(applicationSearchRequest.getPurpose())) {
+            criteriaBuilder.addCriteria(new SearchCriteria("purpose", "like", applicationSearchRequest.getPurpose(), ""));
+        }
+        if(!StringUtils.isBlank(applicationSearchRequest.getStatus()))
+            criteriaBuilder.addCriteria(new SearchCriteria("status","eq",applicationSearchRequest.getStatus(),""));
+
+        if(applicationSearchRequest.getFromDate()!=null
+                && applicationSearchRequest.getToDate()!=null)
+            criteriaBuilder.addCriteria(new SearchCriteria("registerDate","btn","",applicationSearchRequest.getFromDate(),applicationSearchRequest.getToDate()));
+
+        Criteria root = criteriaBuilder.build();
         Query query
                 = new Query(root);
         return mongoTemplate.find(query,Application.class);
+    }
+
+    private String toLikeRegex(String source) {
+        return source.replaceAll("\\*", ".*");
     }
 
     @Override
