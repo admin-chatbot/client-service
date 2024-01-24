@@ -100,8 +100,14 @@ public class UserServiceImpl implements UserService {
         if(userSearchRequest==null)
             return null;
 
-        if(userSearchRequest.getClientId()!=null && userSearchRequest.getMobile() > 0)
+        if(userSearchRequest.getMobile() > 0)
             criteriaBuilder.addCriteria(new SearchCriteria("mobile","eq", userSearchRequest.getMobile(),""));
+
+        System.out.println("Client Id: " +userSearchRequest.getClientId());
+
+        if(userSearchRequest.getClientId()>0)
+            criteriaBuilder.addCriteria(new SearchCriteria("clientId","eq", userSearchRequest.getClientId(),""));
+
 
         if(!StringUtils.isBlank(userSearchRequest.getEmpId())) {
             criteriaBuilder.addCriteria(new SearchCriteria("empId", "like", userSearchRequest.getEmpId(), ""));
