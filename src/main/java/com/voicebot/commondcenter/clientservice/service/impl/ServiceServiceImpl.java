@@ -1,7 +1,7 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
 
-import com.voicebot.commondcenter.clientservice.dto.ServiceSearchRequest;
+
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.filter.CriteriaBuilder;
 import com.voicebot.commondcenter.clientservice.filter.SearchCriteria;
@@ -73,16 +73,5 @@ public class ServiceServiceImpl implements ServiceService {
         return serviceRepository.findServicesByClientIdAndKeywordLike(clientId, keyword);
     }
 
-    @Override
-    public List<com.voicebot.commondcenter.clientservice.entity.Service> search(ServiceSearchRequest serviceSearchRequest) {
-        Criteria root =   new CriteriaBuilder()
-                .addCriteria(new SearchCriteria("name","eq",serviceSearchRequest.getName(),""))
-                .addCriteria(new SearchCriteria("endPoint","eq", serviceSearchRequest.getEndPoint(),""))
-                .addCriteria(new SearchCriteria("method","eq", serviceSearchRequest.getMethod(),"" ))
-                .build();
-        Query query
-                = new Query(root);
-        return mongoTemplate.find(query, com.voicebot.commondcenter.clientservice.entity.Service.class);
-        //return null;
-    }
+
 }

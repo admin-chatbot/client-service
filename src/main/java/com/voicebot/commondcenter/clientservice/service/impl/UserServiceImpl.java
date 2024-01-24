@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
+import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.UserSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.User;
@@ -9,6 +10,7 @@ import com.voicebot.commondcenter.clientservice.filter.SearchCriteria;
 import com.voicebot.commondcenter.clientservice.repository.UserRepository;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -86,20 +88,48 @@ public class UserServiceImpl implements UserService {
         return userRepository.findUserByEmpId(empId);
     }
 
+
+
     @Override
     public List<User> search(UserSearchRequest userSearchRequest) {
-        Criteria root =   new CriteriaBuilder()
-                .addCriteria(new SearchCriteria("empId","eq", userSearchRequest.getEmpId(),""))
-                .addCriteria(new SearchCriteria("name","eq", userSearchRequest.getName(),""))
-                .addCriteria(new SearchCriteria("mobile","eq", userSearchRequest.getMobile(),"" ))
-                .addCriteria(new SearchCriteria("access", "eq", userSearchRequest.getAccess(), ""))
-                .addCriteria(new SearchCriteria("status", "eq", userSearchRequest.getStatus()))
-                .build();
+
+
+
+        CriteriaBuilder criteriaBuilder = new CriteriaBuilder();
+
+        if(userSearchRequest==null)
+            return null;
+
+        if(userSearchRequest.getMobile() > 0)
+            criteriaBuilder.addCriteria(new SearchCriteria("mobile","eq", userSearchRequest.getMobile(),""));
+
+        System.out.println("Client Id: " +userSearchRequest.getClientId());
+
+        if(userSearchRequest.getClientId()>0)
+            criteriaBuilder.addCriteria(new SearchCriteria("clientId","eq", userSearchRequest.getClientId(),""));
+
+
+        if(!StringUtils.isBlank(userSearchRequest.getEmpId())) {
+            criteriaBuilder.addCriteria(new SearchCriteria("empId", "like", userSearchRequest.getEmpId(), ""));
+        }
+        if(!StringUtils.isBlank(userSearchRequest.getName())) {
+            criteriaBuilder.addCriteria(new SearchCriteria("name", "like", userSearchRequest.getName(), ""));
+        }
+        if(!StringUtils.isBlank(userSearchRequest.getEmail())) {
+            criteriaBuilder.addCriteria(new SearchCriteria("email", "like", userSearchRequest.getEmail(), ""));
+        }
+
+        if(!StringUtils.isBlank(userSearchRequest.getStatus()))
+            criteriaBuilder.addCriteria(new SearchCriteria("status","eq",userSearchRequest.getStatus(),""));
+
+        if(!StringUtils.isBlank(userSearchRequest.getAccess()))
+            criteriaBuilder.addCriteria(new SearchCriteria("access","eq",userSearchRequest.getAccess(),""));
+
+        Criteria root = criteriaBuilder.build();
         Query query
                 = new Query(root);
-        return mongoTemplate.find(query, User.class);
+        return mongoTemplate.find(query,User.class);
     }
-
     public List<User> findByExample(Example<User> userExample) {
         return userRepository.findAll(userExample);
     }
