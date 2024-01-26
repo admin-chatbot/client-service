@@ -66,8 +66,9 @@ public class ServiceEndpoint {
         try {
             Service service = Service.builder().build();
             FieldUtils.writeDeclaredField(service,"name","jitendra",true);
-            FieldUtils.writeDeclaredField(service,"EndPoint","1",true);
-            FieldUtils.writeDeclaredField(service,"Method","1",true);
+            FieldUtils.writeDeclaredField(service,"endPoint","1",true);
+            FieldUtils.writeDeclaredField(service,"method","POST",true);
+            FieldUtils.writeDeclaredField(service,"status","ACTIVE",true);
             System.out.println(service);
             return ResponseBuilder.ok("",null);
         }catch (Exception exception) {
@@ -94,7 +95,7 @@ public class ServiceEndpoint {
                                                               @PathVariable(name = "status") Status status) {
         try {
 
-            Service service = Service.builder().clintId(clientId).status(status).build();
+            Service service = Service.builder().clientId(clientId).status(status).build();
             Example<Service> serviceExample = Example.of(service);
             LOGGER.info("getAllServiceByClientId");
             List<Service> services = serviceService.findByExample(serviceExample);

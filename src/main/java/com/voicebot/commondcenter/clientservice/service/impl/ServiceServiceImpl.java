@@ -107,8 +107,8 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
     public List<Service> search(Service service) {
         Criteria root = new Criteria();
         Criteria name = new Criteria("name").is(service.getName());
-        Criteria date = new Criteria("").gt("").lt("");
-        root.andOperator(name);
+        Criteria method = new Criteria("method").is(service.getMethod());
+        root.andOperator(name,method);
         Query query
                 = new Query(root);
         return mongoTemplate.find(query,Service.class);

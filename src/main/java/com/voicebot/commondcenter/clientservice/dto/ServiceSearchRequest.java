@@ -14,7 +14,7 @@ public class ServiceSearchRequest {
 
    private String name;
    private String endPoint;
-   private Long method;
+   private String method;
    private String status;
    private Long clientId;
 
