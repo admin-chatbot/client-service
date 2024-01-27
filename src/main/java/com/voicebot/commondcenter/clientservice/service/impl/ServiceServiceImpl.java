@@ -108,6 +108,8 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
         Criteria root = new Criteria();
         Criteria name = new Criteria("name").is(service.getName());
         Criteria method = new Criteria("method").is(service.getMethod());
+        Criteria status = new Criteria("status").is(service.getStatus());
+        Criteria endPoint = new Criteria("endPoint").is(service.getEndpoint());
         root.andOperator(name,method);
         Query query
                 = new Query(root);
@@ -132,13 +134,16 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
         if(!StringUtils.isBlank(serviceSearchRequest.getEndPoint())) {
             criteriaBuilder.addCriteria(new SearchCriteria("endPoint", "like", serviceSearchRequest.getEndPoint(), ""));
         }
-        if(!StringUtils.isBlank(serviceSearchRequest.getStatus()))
+        if(!StringUtils.isBlank(serviceSearchRequest.getMethod()))
             criteriaBuilder.addCriteria(new SearchCriteria("method","like",serviceSearchRequest.getMethod(),""));
 
+        if(!StringUtils.isBlank(serviceSearchRequest.getStatus()))
+            criteriaBuilder.addCriteria(new SearchCriteria("status","like",serviceSearchRequest.getStatus(),""));
 
         Criteria root = criteriaBuilder.build();
         Query query
                 = new Query(root);
+
         return mongoTemplate.find(query,Service.class);
     }
 
