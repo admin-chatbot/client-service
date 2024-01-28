@@ -86,15 +86,15 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         Boolean isValid = false;// service.isValidUser(accessToken);
 
-        Optional<Client> client = null;
-        client = clientService.authenticate(accessToken);
+        Optional<Client> client
+                = clientService.authenticate(accessToken);
 
         /*************************************
          * CHECK SESSION TIME OUT *
          *************************************/
         if (client.isPresent()) {
             Date lastLogin = client.get().getLastLogin();
-            Long lastLoginInMills = lastLogin.getTime();
+            long lastLoginInMills = lastLogin.getTime();
             long milliseconds = 24 * 60 * 60 * 1000;
             if (System.currentTimeMillis() > (lastLoginInMills + milliseconds)) {
                 response.getWriter().write("Session expire. Please login again");
@@ -104,6 +104,7 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
                 isValid = true;
                 request.setAttribute("userId", client.get().getEmail());
                 request.setAttribute("username", client.get().getClientName());
+                request.setAttribute("clientId",client.get().getId());
             }
         }
 

@@ -4,11 +4,13 @@ import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Login;
 import com.voicebot.commondcenter.clientservice.exception.EmailAlreadyRegistered;
 import com.voicebot.commondcenter.clientservice.exception.InvalidUserNameAndPassword;
+import com.voicebot.commondcenter.clientservice.exception.TokenNotFoundException;
 import com.voicebot.commondcenter.clientservice.repository.ClientRepository;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.utils.EncryptDecryptPassword;
 import com.voicebot.commondcenter.clientservice.utils.SecureTokenGenerator;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,7 +88,10 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Optional<Client> authenticate(String accessToken) {
-        return Optional.empty();
+    public Optional<Client> authenticate(String accessToken) throws TokenNotFoundException {
+        if(StringUtils.isBlank(accessToken))
+            throw new TokenNotFoundException();
+
+        return clientRepository.findByToken(accessToken);
     }
 }

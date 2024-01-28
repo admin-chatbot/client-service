@@ -1,7 +1,6 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
-import com.voicebot.commondcenter.clientservice.dto.ServiceSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
@@ -223,24 +222,5 @@ public class ServiceEndpoint {
         }
     }
 
-    @PostMapping( path = "search/" )
-    @Operation(parameters = {
-    @Parameter(in = ParameterIn.HEADER
-                  , name = "X-AUTH-LOG-HEADER"
-                  , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
-    })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Pageable.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseEntity.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
-    })
-    public ResponseEntity<?> search(@RequestBody ServiceSearchRequest searchRequest ) {
-        try {
-            List<Service> services =  serviceService.search(searchRequest);
-            return ResponseBuilder.ok("",services);
-        }catch (Exception exception) {
-            exception.printStackTrace();
-            return ResponseBuilder.build500(exception);
-        }
-    }
+
 }
