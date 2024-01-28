@@ -1,6 +1,12 @@
 package com.voicebot.commondcenter.clientservice.service;
 
 
+ 
+
+import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
+import com.voicebot.commondcenter.clientservice.dto.ServiceSearchRequest;
+
+ 
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import org.bson.types.ObjectId;
@@ -26,4 +32,9 @@ public interface ServiceService {
     List<Service> findServiceByClientIdAndKeywordLike(Long clientId,String keyword);
 
 
+ 
+    public List<Service> search(ServiceSearchRequest serviceSearchRequest);
+
+
+ 
 }
