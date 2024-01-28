@@ -36,6 +36,8 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
     private ServiceRepository serviceRepository;
 
     @Autowired
+    private ServiceParameterServiceImpl serviceParameterService;
+    @Autowired
     SequenceGeneratorService sequenceGeneratorService;
 
     @Autowired
@@ -126,7 +128,7 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
 
         if(serviceSearchRequest.getClientId()!=null
                 && serviceSearchRequest.getClientId() > 0)
-            criteriaBuilder.addCriteria(new SearchCriteria("clintId","eq", serviceSearchRequest.getClientId(),""));
+            criteriaBuilder.addCriteria(new SearchCriteria("clientId","eq", serviceSearchRequest.getClientId(),""));
 
         if(!StringUtils.isBlank(serviceSearchRequest.getName())) {
             criteriaBuilder.addCriteria(new SearchCriteria("name", "like", serviceSearchRequest.getName(), ""));
