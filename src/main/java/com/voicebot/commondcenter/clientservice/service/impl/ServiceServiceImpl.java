@@ -2,9 +2,11 @@ package com.voicebot.commondcenter.clientservice.service.impl;
 
 
 
+
 import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ServiceSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
+
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.filter.CriteriaBuilder;
 import com.voicebot.commondcenter.clientservice.filter.SearchCriteria;
@@ -88,6 +90,7 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
 
 
 
+
     @Override
     public List<Service> findByExample(Example<Service> serviceExample) {
         return serviceRepository.findAll(serviceExample);
@@ -158,5 +161,6 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
         Example<Service> serviceExample = Example.of(service);
         return findByExample(serviceExample,pageable);
     }
+
 }
 
