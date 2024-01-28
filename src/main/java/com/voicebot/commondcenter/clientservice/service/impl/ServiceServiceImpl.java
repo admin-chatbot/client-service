@@ -133,6 +133,7 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
                 && serviceSearchRequest.getClientId() > 0)
             criteriaBuilder.addCriteria(new SearchCriteria("clientId","eq", serviceSearchRequest.getClientId(),""));
 
+
         if(!StringUtils.isBlank(serviceSearchRequest.getName())) {
             criteriaBuilder.addCriteria(new SearchCriteria("name", "like", serviceSearchRequest.getName(), ""));
         }
