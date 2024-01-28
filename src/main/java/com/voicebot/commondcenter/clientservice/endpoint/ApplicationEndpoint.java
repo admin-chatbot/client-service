@@ -4,11 +4,13 @@ import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
+import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.service.ApplicationService;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
 import com.voicebot.commondcenter.clientservice.service.impl.ApplicationServiceImpl;
+import com.voicebot.commondcenter.clientservice.service.impl.ServiceServiceImpl;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import io.swagger.v3.core.util.OpenAPISchema2JsonSchema;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +50,8 @@ public class ApplicationEndpoint {
     @Autowired
     private ApplicationServiceImpl applicationService;
 
+    @Autowired
+    private ServiceServiceImpl serviceService;
     @Autowired
     private ClientService clientService;
 
@@ -202,6 +206,10 @@ public class ApplicationEndpoint {
             Example<Application> applicationExample = Example.of(application);
 
             List<Application> applications = applicationService.findByExample(applicationExample);
+           applications.forEach(application1 -> {
+                List<Service> services = serviceService.findAllByApplicationId(application1.getId());
+                application1.setServiceCount(services.size());
+            });
             return ResponseEntity.ok(ResponseBody.builder()
                     .message(applications!=null? String.valueOf(applications.size()) :0+" application found.")
                     .code(HttpStatus.OK.value())
