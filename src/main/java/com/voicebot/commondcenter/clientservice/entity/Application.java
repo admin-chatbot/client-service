@@ -1,9 +1,7 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 import com.voicebot.commondcenter.clientservice.enums.Status;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -18,6 +16,8 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Application extends AbstractBaseEntity implements Serializable {
 
     @Transient
@@ -48,8 +48,8 @@ public class Application extends AbstractBaseEntity implements Serializable {
     @NotNull(message = "Client Id should not null or empty.")
     private Long clintId;
 
-
-
+    @Transient
+    private Integer serviceCount;
 
 
 }

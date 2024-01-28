@@ -4,8 +4,10 @@ import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 
 
+
 import com.voicebot.commondcenter.clientservice.dto.ServiceSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
+
 
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Service;
@@ -311,6 +313,7 @@ public class ServiceEndpoint {
     }
 
 
+
     @PostMapping( path = "search/" )
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
@@ -331,6 +334,7 @@ public class ServiceEndpoint {
             return ResponseBuilder.build500(exception);
         }
     }
+
 
 
 }

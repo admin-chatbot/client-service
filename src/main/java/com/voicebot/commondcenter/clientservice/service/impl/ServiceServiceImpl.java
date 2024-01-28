@@ -1,12 +1,11 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
-
-
+ 
 
 import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ServiceSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
-
+ 
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.filter.CriteriaBuilder;
 import com.voicebot.commondcenter.clientservice.filter.SearchCriteria;
@@ -87,8 +86,7 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
         return serviceRepository.findServicesByClientIdAndKeywordLike(clientId, keyword);
     }
 
-
-
+ 
 
 
     @Override
@@ -163,5 +161,6 @@ public class ServiceServiceImpl implements ServiceService, BaseService<Service> 
         return findByExample(serviceExample,pageable);
     }
 
+ 
 }
 
