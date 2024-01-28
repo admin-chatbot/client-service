@@ -68,6 +68,9 @@ public class Service extends AbstractBaseEntity implements  Serializable {
     private Long clintId;
 
     @Transient
+    private int parameterCount;
+
+    @Transient
     private ArrayList<ServiceParameter> serviceParameters;
 
 
