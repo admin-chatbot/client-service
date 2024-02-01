@@ -149,6 +149,7 @@ public class ServiceLogServiceImpl implements ServiceLogService {
 
         String timeRange = dashboardSearchRequest.getTimeFrame();
         Long clientId = dashboardSearchRequest.getClientId();
+        String status = dashboardSearchRequest.getStatus();
 
         // Calculate start date based on time range
         switch (timeRange) {
@@ -167,14 +168,24 @@ public class ServiceLogServiceImpl implements ServiceLogService {
                 break;
         }
 
+
         // Create the aggregation pipeline
-        Aggregation aggregation = Aggregation.newAggregation(
-                // Match documents for the specified client and within the specified date range
-                Aggregation.match(Criteria.where("client").is(clientId)
-                        .and("logDate").gte(startDate).lte(endDate))
-                // Group documents by status and count the occurrences
-                //Aggregation.group("status").count().as("count")
-        );
+        Aggregation aggregation;
+
+        if (status.equalsIgnoreCase("ALL")) {
+            aggregation = Aggregation.newAggregation(
+                    // Match documents for the specified client and within the specified date range
+                    Aggregation.match(Criteria.where("client").is(clientId)
+                            .and("logDate").gte(startDate).lte(endDate))
+            );
+        } else {
+            aggregation = Aggregation.newAggregation(
+                    // Match documents for the specified client, status, and within the specified date range
+                    Aggregation.match(Criteria.where("client").is(clientId)
+                            .and("status").is(status)
+                            .and("logDate").gte(startDate).lte(endDate))
+            );
+        }
 
         // Execute the aggregation query and return the result
         return mongoTemplate.aggregate(aggregation, "servicelog", ServiceLog.class).getMappedResults();

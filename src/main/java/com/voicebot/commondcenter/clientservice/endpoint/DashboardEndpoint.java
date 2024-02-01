@@ -23,7 +23,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/dashboard/" )
@@ -52,9 +54,49 @@ public class DashboardEndpoint {
         try {
             DashboardDto dashboardDto = new DashboardDto();
             List<ServiceLog> serviceLogs = dashboardService.getDashboardByClientIdAndStatusAndTimeframe(dashboardSearchRequest);
+
+            Map<String, Integer> statusCountMap = new HashMap<>();
+            Map<Long, Integer> applicationCountMap = new HashMap<>();
+            Map<String, Integer> serviceCountMap = new HashMap<>();
+
+            for (ServiceLog log : serviceLogs) {
+                // Count documents by application
+                applicationCountMap.put(log.getApplication(), applicationCountMap.getOrDefault(log.getApplication(), 0) + 1);
+
+                // Count documents by service name
+                serviceCountMap.put(log.getServiceName(), serviceCountMap.getOrDefault(log.getServiceName(), 0) + 1);
+            }
+
+            // Step 2: Calculate the percentage of each application and service name
+            int totalLogs = serviceLogs.size();
+
+            Map<String, Float> statusPercentageMap = new HashMap<>();
+            Map<Long, Float> applicationPercentageMap = new HashMap<>();
+            Map<String, Float> servicePercentageMap = new HashMap<>();
+
+            for (ServiceLog log : serviceLogs) {
+                // Count documents by status
+                statusCountMap.put(String.valueOf(log.getStatus()), statusCountMap.getOrDefault(String.valueOf(log.getStatus()), 0) + 1);
+            }
+
+            for (Map.Entry<Long, Integer> entry : applicationCountMap.entrySet()) {
+                float percentage = ((float) entry.getValue() / totalLogs) * 100;
+                applicationPercentageMap.put(entry.getKey(), percentage);
+            }
+            for (Map.Entry<String, Integer> entry : serviceCountMap.entrySet()) {
+                float percentage = ((float) entry.getValue() / totalLogs) * 100;
+                servicePercentageMap.put(entry.getKey(), percentage);
+            }
+
+            for (Map.Entry<String, Integer> entry : statusCountMap.entrySet()) {
+                float percentage = ((float) entry.getValue() / totalLogs) * 100;
+                statusPercentageMap.put(entry.getKey(), percentage);
+            }
+
             dashboardDto.setServiceLogs(serviceLogs);
-            dashboardDto.setServiceCallsByApplication(null);
-            dashboardDto.setServiceCallsByApplication(null);
+            dashboardDto.setServiceCallsByStatus(statusPercentageMap);
+            dashboardDto.setServiceCallsByApplication(applicationPercentageMap);
+            dashboardDto.setServiceCallsByServiceOrUser(servicePercentageMap);
 
             return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
         }catch (Exception exception){
