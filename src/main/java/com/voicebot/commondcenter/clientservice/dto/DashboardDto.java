@@ -19,7 +19,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class DashboardDto {
     private List<ServiceLog> serviceLogs;
-    private Map<String, Float> serviceCallsByStatus;
-    private Map<Long, Float> serviceCallsByApplication;
-    private Map<String, Float> serviceCallsByServiceOrUser;
+    private Map<String, Integer> serviceCallsByStatus;
+    private Map<Long, Integer> serviceCallsByApplication;
+    private Map<String, Integer> serviceCallsByServiceOrUser;
 }

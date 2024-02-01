@@ -65,38 +65,16 @@ public class DashboardEndpoint {
 
                 // Count documents by service name
                 serviceCountMap.put(log.getServiceName(), serviceCountMap.getOrDefault(log.getServiceName(), 0) + 1);
+
+                statusCountMap.put(String.valueOf(log.getStatus()), statusCountMap.getOrDefault(String.valueOf(log.getStatus()), 0) + 1);
             }
 
             // Step 2: Calculate the percentage of each application and service name
             int totalLogs = serviceLogs.size();
-
-            Map<String, Float> statusPercentageMap = new HashMap<>();
-            Map<Long, Float> applicationPercentageMap = new HashMap<>();
-            Map<String, Float> servicePercentageMap = new HashMap<>();
-
-            for (ServiceLog log : serviceLogs) {
-                // Count documents by status
-                statusCountMap.put(String.valueOf(log.getStatus()), statusCountMap.getOrDefault(String.valueOf(log.getStatus()), 0) + 1);
-            }
-
-            for (Map.Entry<Long, Integer> entry : applicationCountMap.entrySet()) {
-                float percentage = ((float) entry.getValue() / totalLogs) * 100;
-                applicationPercentageMap.put(entry.getKey(), percentage);
-            }
-            for (Map.Entry<String, Integer> entry : serviceCountMap.entrySet()) {
-                float percentage = ((float) entry.getValue() / totalLogs) * 100;
-                servicePercentageMap.put(entry.getKey(), percentage);
-            }
-
-            for (Map.Entry<String, Integer> entry : statusCountMap.entrySet()) {
-                float percentage = ((float) entry.getValue() / totalLogs) * 100;
-                statusPercentageMap.put(entry.getKey(), percentage);
-            }
-
             dashboardDto.setServiceLogs(serviceLogs);
-            dashboardDto.setServiceCallsByStatus(statusPercentageMap);
-            dashboardDto.setServiceCallsByApplication(applicationPercentageMap);
-            dashboardDto.setServiceCallsByServiceOrUser(servicePercentageMap);
+            dashboardDto.setServiceCallsByStatus(statusCountMap);
+            dashboardDto.setServiceCallsByApplication(applicationCountMap);
+            dashboardDto.setServiceCallsByServiceOrUser(serviceCountMap);
 
             return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
         }catch (Exception exception){
