@@ -11,11 +11,14 @@ import com.voicebot.commondcenter.clientservice.entity.Application;
 
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Service;
+import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.ServiceService;
+import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
 import com.voicebot.commondcenter.clientservice.service.impl.ApplicationServiceImpl;
 import com.voicebot.commondcenter.clientservice.service.impl.ServiceServiceImpl;
+import com.voicebot.commondcenter.clientservice.service.impl.ServiceParameterServiceImpl;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,6 +56,8 @@ public class ServiceEndpoint {
 
     @Autowired
     private ServiceServiceImpl serviceService;
+    @Autowired
+    private ServiceParameterServiceImpl serviceParameterService;
 
 
     @GetMapping( path = "search/{keyword}/" )
@@ -66,9 +71,11 @@ public class ServiceEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> search(Pageable pageable) {
+    //public ResponseEntity<?> search(Pageable pageable) {
+        public ResponseEntity<?> search(@PathVariable String keyword) {
         try {
             Service service = Service.builder().build();
+            FieldUtils.writeDeclaredField(service,"clientId","1",true);
             FieldUtils.writeDeclaredField(service,"name","jitendra",true);
             FieldUtils.writeDeclaredField(service,"endPoint","1",true);
             FieldUtils.writeDeclaredField(service,"method","POST",true);
@@ -97,12 +104,21 @@ public class ServiceEndpoint {
     })
     public ResponseEntity<?> getAllServiceByClientIdAndStatus(@PathVariable(name = "id") Long clientId,
                                                               @PathVariable(name = "status") Status status) {
+
+
         try {
 
             Service service = Service.builder().clientId(clientId).status(status).build();
             Example<Service> serviceExample = Example.of(service);
             LOGGER.info("getAllServiceByClientId");
+            LOGGER.info("Fetching services for clientId: {} and status: {}", clientId, status);
             List<Service> services = serviceService.findByExample(serviceExample);
+            LOGGER.info("Number of services retrieved: {}", services.size());
+            services.forEach(service1 -> {
+                List<ServiceParameter> serviceParameters = serviceParameterService.findByServiceId(service1.getId());
+                service1.setParameterCount(serviceParameters.size());
+
+            });
             return ResponseEntity.ok(ResponseBody.builder()
                     .message(services!=null? String.valueOf(services.size()) :0+" services found.")
                     .code(HttpStatus.OK.value())
