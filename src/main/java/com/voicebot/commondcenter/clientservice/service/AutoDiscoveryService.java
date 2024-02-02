@@ -10,11 +10,11 @@ import java.util.List;
 @org.springframework.stereotype.Service
 public interface AutoDiscoveryService {
 
-    public List<Service> discover(URL url ) throws Exception;
+    List<Service> discover(URL url ) throws Exception;
 
-    public List<Service> discover(String contents );
+    List<Service> discover(String contents );
 
-    public ServiceDocsType findDocsType(String url) throws IOException;
+    ServiceDocsType findDocsType(String url) throws IOException;
 
-    public String getDocsJsonAsString(String url) throws IOException;
+    String getDocsJsonAsString(String url) throws IOException;
 }

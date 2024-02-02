@@ -8,12 +8,12 @@ import java.util.List;
 @Service
 public interface BotRequestLogService {
 
-    public List<ClientCountDto> getMostActiveClient();
+    List<ClientCountDto> getMostActiveClient();
 
-    public List<ClientCountDto> getLeastActiveClient();
+    List<ClientCountDto> getLeastActiveClient();
 
-    public int countOfSuccessCalls();
+    int countOfSuccessCalls();
 
-    public int countOfFailedCalls();
+    int countOfFailedCalls();
 
 }
