@@ -14,15 +14,15 @@ import java.util.Optional;
 @Service
 public interface ClientService {
 
-    public List<Client> findAll();
+    List<Client> findAll();
 
-    public Optional<Client> findOne(Long id);
+    Optional<Client> findOne(Long id);
 
-    public Client save(Client client);
+    Client save(Client client);
 
-    public Client register(Client client) throws EmailAlreadyRegistered;
+    Client register(Client client) throws EmailAlreadyRegistered;
 
-    public Client login(Login login) throws InvalidUserNameAndPassword;
+    Client login(Login login) throws InvalidUserNameAndPassword;
 
     Optional<Client> authenticate(String accessToken) throws TokenNotFoundException;
 }

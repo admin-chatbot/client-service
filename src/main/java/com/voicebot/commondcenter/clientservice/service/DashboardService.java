@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 public interface DashboardService {
     //public ApplicationService getApplicationService();
 
-   public DashboardDto getDashboard();
+    DashboardDto getDashboard();
 
-    public DashboardDto getDashboardByClintId(Long clientId);
+    DashboardDto getDashboardByClintId(Long clientId);
 
 }
