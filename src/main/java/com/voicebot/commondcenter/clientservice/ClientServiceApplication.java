@@ -10,9 +10,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication
 @EnableMongoRepositories
 @OpenAPIDefinition(info = @Info(title = "Client Service", version = "2.0", description = "Command Center Api"))
-
 public class ClientServiceApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(ClientServiceApplication.class, args);
 	}
