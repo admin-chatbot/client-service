@@ -172,9 +172,6 @@ public class ServiceLogServiceImpl implements ServiceLogService {
         // Create the aggregation pipeline
         Aggregation aggregation;
 
-        System.out.println("Start Date is: " +startDate);
-        System.out.println("End Date is: " +endDate);
-
         if (status.equalsIgnoreCase("ALL")) {
             aggregation = Aggregation.newAggregation(
                     // Match documents for the specified client and within the specified date range
