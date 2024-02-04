@@ -76,6 +76,8 @@ public class DashboardEndpoint {
             dashboardDto.setServiceCallsByApplication(applicationCountMap);
             dashboardDto.setServiceCallsByServiceOrUser(serviceCountMap);
 
+            System.out.println(dashboardDto.getServiceCallsByStatus());
+
             return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
         }catch (Exception exception){
             LOGGER.error("",exception);

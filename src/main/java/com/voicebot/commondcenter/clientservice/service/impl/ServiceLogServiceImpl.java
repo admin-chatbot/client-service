@@ -147,9 +147,9 @@ public class ServiceLogServiceImpl implements ServiceLogService {
         Date startDate = null;
         Date endDate = new Date(); // Current date
 
-        String timeRange = dashboardSearchRequest.getTimeFrame();
+        String timeRange = String.valueOf(dashboardSearchRequest.getTimeFrame());
         Long clientId = dashboardSearchRequest.getClientId();
-        String status = dashboardSearchRequest.getStatus();
+        String status = String.valueOf(dashboardSearchRequest.getStatus());
 
         // Calculate start date based on time range
         switch (timeRange) {
@@ -171,6 +171,9 @@ public class ServiceLogServiceImpl implements ServiceLogService {
 
         // Create the aggregation pipeline
         Aggregation aggregation;
+
+        System.out.println("Start Date is: " +startDate);
+        System.out.println("End Date is: " +endDate);
 
         if (status.equalsIgnoreCase("ALL")) {
             aggregation = Aggregation.newAggregation(
