@@ -13,23 +13,13 @@ import java.util.Optional;
 @Service
 public interface ServiceParameterService {
 
-    public ServiceParameterRepository getRepository();
-
-    public ServiceParameter save(ServiceParameter serviceParameter);
-
-    public ServiceParameter edit(ServiceParameter serviceParameter);
-
-    public List<ServiceParameter> save(List<ServiceParameter> serviceParameters);
-
-    public List<ServiceParameter> findByServiceId(Long serviceId);
-
-    public Page<ServiceParameter> find(Pageable pageable);
-
-    public List<ServiceParameter> find();
-
-    public Optional<ServiceParameter> findOne(Long id);
-
-
-
+     ServiceParameterRepository getRepository();
+     ServiceParameter save(ServiceParameter serviceParameter);
+     ServiceParameter edit(ServiceParameter serviceParameter);
+     List<ServiceParameter> save(List<ServiceParameter> serviceParameters);
+     List<ServiceParameter> findByServiceId(Long serviceId);
+     Page<ServiceParameter> find(Pageable pageable);
+     List<ServiceParameter> find();
+     Optional<ServiceParameter> findOne(Long id);
 
 }

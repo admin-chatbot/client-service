@@ -8,15 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BaseService<I> {
-    public List<I> findByExample(Example<I> iExample);
-
-    public Page<I> findByExample(Example<I> iExample, Pageable pageable);
-
-    public Optional<I> findOneByExample(Example<I> iExample);
-
-    public List<I> search(I i);
-
-    public Page<I> search(I i,Pageable pageable);
+    List<I> findByExample(Example<I> iExample);
+    Page<I> findByExample(Example<I> iExample, Pageable pageable);
+    Optional<I> findOneByExample(Example<I> iExample);
+    List<I> search(I i);
+    Page<I> search(I i,Pageable pageable);
 
 
 }

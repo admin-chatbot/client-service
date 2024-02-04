@@ -11,8 +11,12 @@ import java.util.List;
 public interface DashboardService {
     //public ApplicationService getApplicationService();
 
+ 
+    DashboardDto getDashboard();
 
-
-    public List<ServiceLog> getDashboardByClientIdAndStatusAndTimeframe(DashboardSearchRequest dashboardSearchRequest);
+    DashboardDto getDashboardByClintId(Long clientId);
+ 
+    List<ServiceLog> getDashboardByClientIdAndStatusAndTimeframe(DashboardSearchRequest dashboardSearchRequest);
+ 
 
 }
