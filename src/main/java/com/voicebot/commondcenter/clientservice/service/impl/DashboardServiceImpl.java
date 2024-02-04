@@ -21,12 +21,19 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<ServiceLog> getDashboardByClientIdAndStatusAndTimeframe(DashboardSearchRequest dashboardSearchRequest) {
-     /*   DashboardDto dashboardDto = new DashboardDto();
-        dashboardDto.setServiceLogs(null);
-        dashboardDto.setServiceCallsByApplication(null);
-        dashboardDto.setServiceCallsByServiceOrUser(null);*/
-        List<ServiceLog> serviceLogs = serviceLogService.getServiceLogCountByStatusAndDate(dashboardSearchRequest);
-        return serviceLogs;
+    public DashboardDto getDashboard() {
+        return null;
     }
+
+    @Override
+    public DashboardDto getDashboardByClintId(Long clientId) {
+        return null;
+    }
+
+    @Override
+    public List<ServiceLog> getDashboardByClientIdAndStatusAndTimeframe(DashboardSearchRequest dashboardSearchRequest) {
+        return serviceLogService.getServiceLogCountByStatusAndDate(dashboardSearchRequest);
+    }
+
+
 }
