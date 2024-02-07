@@ -4,12 +4,11 @@ import com.voicebot.commondcenter.clientservice.dto.AutoDiscoverServiceRequest;
 import com.voicebot.commondcenter.clientservice.dto.AutoDiscoverServiceRequestBody;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
+import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
 import com.voicebot.commondcenter.clientservice.repository.ServiceParameterRepository;
-import com.voicebot.commondcenter.clientservice.service.AutoDiscoveryService;
-import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
-import com.voicebot.commondcenter.clientservice.service.ServiceService;
+import com.voicebot.commondcenter.clientservice.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -23,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +31,7 @@ import javax.validation.Valid;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,8 +50,11 @@ public class  AutoDiscoveryEndpoint {
     @Autowired
     private ServiceParameterService serviceParameterService;
 
+    @Autowired
+    private ApplicationService applicationService;
 
-    @PostMapping(path = "discover/")
+
+    @PostMapping(path = "discover/{id}/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -60,9 +64,15 @@ public class  AutoDiscoveryEndpoint {
             @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
-    public ResponseEntity<?> discover(@RequestParam(name = "url") String url) {
+    public ResponseEntity<?> discover(@PathVariable("id") Long id) {
         try{
-            List<Service> services = autoDiscoveryService.discover(new URL(url));
+
+             Optional<Application> application = applicationService.findOne(id);
+
+             if (application.isEmpty()){
+                 return ResponseEntity.badRequest().body("Application not found");             }
+
+            List<Service> services = autoDiscoveryService.discover(new URL( application.get().getServiceDocUrl()));
             return ResponseEntity.ok(services);
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
