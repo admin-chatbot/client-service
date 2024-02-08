@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.service;
 
+import com.voicebot.commondcenter.clientservice.dto.DashboardSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ServiceCountDto;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,6 @@ public interface ServiceLogService {
 
     public List<ServiceCountDto> getMaximumCountByServiceNameByClient(Long clintId);
 
-
+    public List<ServiceLog> getServiceLogCountByStatusAndDate(DashboardSearchRequest dashboardSearchRequest);
 
 }

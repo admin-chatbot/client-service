@@ -49,6 +49,6 @@ public class ServiceLog extends AbstractBaseEntity implements  Serializable {
 
     private String response;
 
-
+    private String user;
 
 }

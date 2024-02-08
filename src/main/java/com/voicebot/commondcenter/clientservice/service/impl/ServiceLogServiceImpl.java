@@ -1,5 +1,7 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
+import com.voicebot.commondcenter.clientservice.dto.DashboardDto;
+import com.voicebot.commondcenter.clientservice.dto.DashboardSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ServiceCountDto;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
 import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
@@ -13,8 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -136,4 +141,55 @@ public class ServiceLogServiceImpl implements ServiceLogService {
     public List<String> getTopNServices(int n) {
         return null;
     }
+
+    @Override
+    public List<ServiceLog> getServiceLogCountByStatusAndDate(DashboardSearchRequest dashboardSearchRequest) {
+        Date startDate = null;
+        Date endDate = new Date(); // Current date
+
+        String timeRange = String.valueOf(dashboardSearchRequest.getTimeFrame());
+        Long clientId = dashboardSearchRequest.getClientId();
+        String status = String.valueOf(dashboardSearchRequest.getStatus());
+
+        // Calculate start date based on time range
+        switch (timeRange) {
+            case "currentDay":
+                startDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                break;
+            case "lastWeek":
+                startDate = Date.from(LocalDate.now().minusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                break;
+            case "lastMonth":
+                startDate = Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                break;
+            default:
+                // Default to current day
+                startDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                break;
+        }
+
+
+        // Create the aggregation pipeline
+        Aggregation aggregation;
+
+        if (status.equalsIgnoreCase("ALL")) {
+            aggregation = Aggregation.newAggregation(
+                    // Match documents for the specified client and within the specified date range
+                    Aggregation.match(Criteria.where("client").is(clientId)
+                            .and("logDate").gte(startDate).lte(endDate))
+            );
+        } else {
+            aggregation = Aggregation.newAggregation(
+                    // Match documents for the specified client, status, and within the specified date range
+                    Aggregation.match(Criteria.where("client").is(clientId)
+                            .and("status").is(status)
+                            .and("logDate").gte(startDate).lte(endDate))
+            );
+        }
+
+        // Execute the aggregation query and return the result
+        return mongoTemplate.aggregate(aggregation, "servicelog", ServiceLog.class).getMappedResults();
+    }
 }
+
+
