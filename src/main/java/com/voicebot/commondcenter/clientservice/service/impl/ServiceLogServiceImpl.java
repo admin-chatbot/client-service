@@ -150,6 +150,7 @@ public class ServiceLogServiceImpl implements ServiceLogService {
         String timeRange = String.valueOf(dashboardSearchRequest.getTimeFrame());
         Long clientId = dashboardSearchRequest.getClientId();
         String status = String.valueOf(dashboardSearchRequest.getStatus());
+        Long application = dashboardSearchRequest.getApplication();
 
         // Calculate start date based on time range
         switch (timeRange) {
@@ -172,6 +173,7 @@ public class ServiceLogServiceImpl implements ServiceLogService {
         // Create the aggregation pipeline
         Aggregation aggregation;
 
+
         if (status.equalsIgnoreCase("ALL")) {
             aggregation = Aggregation.newAggregation(
                     // Match documents for the specified client and within the specified date range
@@ -190,6 +192,25 @@ public class ServiceLogServiceImpl implements ServiceLogService {
         // Execute the aggregation query and return the result
         return mongoTemplate.aggregate(aggregation, "servicelog", ServiceLog.class).getMappedResults();
     }
+
+    @Override
+    public List<ServiceLog> getServiceLogsForMonth(DashboardSearchRequest dashboardSearchRequest) {
+        Date startDate = null;
+        Date endDate = new Date(); // Current date
+        Long clientId = dashboardSearchRequest.getClientId();
+        startDate = Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        // Create the aggregation pipeline
+        Aggregation aggregation;
+        aggregation = Aggregation.newAggregation(
+                    // Match documents for the specified client and for the last 1 month
+                    Aggregation.match(Criteria.where("client").is(clientId)
+                            .and("logDate").gte(startDate).lte(endDate)));
+
+        // Execute the aggregation query and return the result
+        return mongoTemplate.aggregate(aggregation, "servicelog", ServiceLog.class).getMappedResults();
+    }
 }
+
 
 

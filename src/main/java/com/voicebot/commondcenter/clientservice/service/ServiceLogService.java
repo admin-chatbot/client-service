@@ -45,4 +45,6 @@ public interface ServiceLogService {
 
     public List<ServiceLog> getServiceLogCountByStatusAndDate(DashboardSearchRequest dashboardSearchRequest);
 
+    public List<ServiceLog> getServiceLogsForMonth(DashboardSearchRequest dashboardSearchRequest);
+
 }
