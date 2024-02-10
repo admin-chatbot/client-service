@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,14 +89,14 @@ public class DashboardServiceImpl implements DashboardService {
             String applicationName = applicationNameMap.get(serviceLog.getApplication());
 
             if ("Daily".equals(timeframe)) {
-                System.out.println("In Daily Timeframe");
 
                 timeframeMap = hourDataMap;
                 int hour = logDateTime.getHour();
                 key = String.valueOf(hour);
                 populateMaps(serviceLog, timeframeMap,key, applicationName);
 
-                key = String.valueOf(logDate.getDayOfMonth());
+                //key = String.valueOf(logDate.getDayOfMonth());
+                key = logDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
                 timeframeMap = weeklyDataMap;
                 populateMaps(serviceLog, timeframeMap,key, applicationName);
@@ -104,7 +105,8 @@ public class DashboardServiceImpl implements DashboardService {
                 populateMaps(serviceLog, timeframeMap,key, applicationName);
 
             } else if ("Weekly".equals(timeframe)) {
-                key = String.valueOf(logDate.getDayOfMonth());
+                //key = String.valueOf(logDate.getDayOfMonth());
+                key = logDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
                 timeframeMap = weeklyDataMap;
                 populateMaps(serviceLog, timeframeMap,key, applicationName);
@@ -113,7 +115,8 @@ public class DashboardServiceImpl implements DashboardService {
                 populateMaps(serviceLog, timeframeMap,key, applicationName);
 
             } else {
-                key = String.valueOf(logDate.getDayOfMonth());
+                //key = String.valueOf(logDate.getDayOfMonth());
+                key = logDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
                 timeframeMap = monthlyDataMap;
                 populateMaps(serviceLog, timeframeMap,key, applicationName);
             }
