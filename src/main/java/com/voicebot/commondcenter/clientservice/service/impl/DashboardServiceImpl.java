@@ -49,6 +49,7 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate currentDate = LocalDate.now();
         LocalDate sevenDaysAgo = currentDate.minusDays(7);
         LocalDate thirtyDaysAgo = currentDate.minusDays(30);
+        System.out.println("Current Date is: " +currentDate);
 
         // Iterate over each ServiceLog record
         for (ServiceLog serviceLog : serviceLogs) {
@@ -56,17 +57,21 @@ public class DashboardServiceImpl implements DashboardService {
             LocalDate logDate = logDateTime.toLocalDate();
             String timeframe;
 
-            if (logDate.equals(currentDate)) {
+           if (logDate.equals(currentDate)) {
+                System.out.println("In Daily" +logDate);
                 timeframe = "Daily";
             } else if (logDate.isAfter(sevenDaysAgo)) {
+               System.out.println("In Weekly" +logDate);
                 timeframe = "Weekly";
             } else if (logDate.isAfter(thirtyDaysAgo)) {
-                timeframe = "Monthly";
+               System.out.println("In Monthly" +logDate);
+               timeframe = "Monthly";
             } else {
                 continue; // Skip if not within last 30 days
             }
             Map<String, Map<String, Map<String, Map<String, Integer>>>> timeframeMap;
             if ("Daily".equals(timeframe)) {
+                System.out.println("In Daily Timeframe");
                 timeframeMap = hourDataMap;
             } else if ("Weekly".equals(timeframe)) {
                 timeframeMap = weeklyDataMap;
