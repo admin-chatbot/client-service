@@ -2,6 +2,7 @@ package com.voicebot.commondcenter.clientservice.service.impl;
 
 import com.voicebot.commondcenter.clientservice.dto.DashboardDto;
 import com.voicebot.commondcenter.clientservice.dto.DashboardSearchRequest;
+import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
 import com.voicebot.commondcenter.clientservice.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,13 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Autowired
     private ServiceLogService serviceLogService;
+    @Autowired
+    private ApplicationService applicationService;
+
+    @Autowired
+    public ApplicationService getApplicationService() {
+        return applicationService;
+    }
 
     @Autowired
     public ServiceLogService getServiceLogService() {
@@ -40,11 +48,18 @@ public class DashboardServiceImpl implements DashboardService {
     public Map<String, Map<String, Map<String, Map<String, Map<String, Integer>>>>> getDashboardByClientIdAndStatusAndTimeframe(DashboardSearchRequest dashboardSearchRequest) {
         List<ServiceLog> serviceLogs = serviceLogService.getServiceLogsForMonth(dashboardSearchRequest);
 
+        Long clientId = dashboardSearchRequest.getClientId();
+        Map<Long, String> applicationNameMap = new HashMap<>();
+        for (Application application : applicationService.findByClint(clientId) ) {
+            applicationNameMap.put(application.getId(), application.getName());
+        }
+
         Map<String, Map<String, Map<String, Map<String, Map<String, Integer>>>>> timeframeDataMap = new HashMap<>();
         Map<String, Map<String, Map<String, Map<String, Integer>>>> hourDataMap = new HashMap<>();
         Map<String, Map<String, Map<String, Map<String, Integer>>>> weeklyDataMap = new HashMap<>();
         Map<String, Map<String, Map<String, Map<String, Integer>>>> monthlyDataMap = new HashMap<>();
 
+        String key;
         // Get the current date
         LocalDate currentDate = LocalDate.now();
         LocalDate sevenDaysAgo = currentDate.minusDays(7);
@@ -70,32 +85,38 @@ public class DashboardServiceImpl implements DashboardService {
                 continue; // Skip if not within last 30 days
             }
             Map<String, Map<String, Map<String, Map<String, Integer>>>> timeframeMap;
+            String applicationName = applicationNameMap.get(serviceLog.getApplication());
+
             if ("Daily".equals(timeframe)) {
                 System.out.println("In Daily Timeframe");
-                timeframeMap = hourDataMap;
-            } else if ("Weekly".equals(timeframe)) {
-                timeframeMap = weeklyDataMap;
-            } else {
-                timeframeMap = monthlyDataMap;
-            }
 
-            String key;
-            if ("Daily".equals(timeframe)) {
+                timeframeMap = hourDataMap;
                 int hour = logDateTime.getHour();
                 key = String.valueOf(hour);
+                populateMaps(serviceLog, timeframeMap,key, applicationName);
+
+                key = String.valueOf(logDate.getDayOfMonth());
+
+                timeframeMap = weeklyDataMap;
+                populateMaps(serviceLog, timeframeMap,key, applicationName);
+
+                timeframeMap = monthlyDataMap;
+                populateMaps(serviceLog, timeframeMap,key, applicationName);
+
+            } else if ("Weekly".equals(timeframe)) {
+                key = String.valueOf(logDate.getDayOfMonth());
+
+                timeframeMap = weeklyDataMap;
+                populateMaps(serviceLog, timeframeMap,key, applicationName);
+
+                timeframeMap = monthlyDataMap;
+                populateMaps(serviceLog, timeframeMap,key, applicationName);
+
             } else {
                 key = String.valueOf(logDate.getDayOfMonth());
+                timeframeMap = monthlyDataMap;
+                populateMaps(serviceLog, timeframeMap,key, applicationName);
             }
-
-            Map<String, Map<String, Map<String, Integer>>> applicationMap = timeframeMap.computeIfAbsent(key, k -> new HashMap<>());
-            Map<String, Map<String, Integer>> serviceMap = applicationMap.computeIfAbsent(String.valueOf(serviceLog.getApplication()), k -> new HashMap<>());
-            Map<String, Integer> statusMap = serviceMap.computeIfAbsent(serviceLog.getServiceName(), k -> new HashMap<>());
-
-            // Update the count for the current status
-            String status = serviceLog.getStatus().name();
-            statusMap.put(status, statusMap.getOrDefault(status, 0) + 1);
-
-            // Populate the timeframeDataMap
 
         }
         timeframeDataMap.put("Daily", hourDataMap);
@@ -105,6 +126,18 @@ public class DashboardServiceImpl implements DashboardService {
         return timeframeDataMap;
 
     }
+
+    public void populateMaps(ServiceLog serviceLog, Map<String, Map<String, Map<String, Map<String, Integer>>>> timeframeMap,String key, String applicationName) {
+        Map<String, Map<String, Map<String, Integer>>> applicationMap = timeframeMap.computeIfAbsent(key, k -> new HashMap<>());
+        Map<String, Map<String, Integer>> serviceMap = applicationMap.computeIfAbsent(applicationName, k -> new HashMap<>());
+        Map<String, Integer> statusMap = serviceMap.computeIfAbsent(serviceLog.getServiceName(), k -> new HashMap<>());
+
+        // Update the count for the current status
+        String status = serviceLog.getStatus().name();
+        statusMap.put(status, statusMap.getOrDefault(status, 0) + 1);
+
+    }
+
 }
 
 
