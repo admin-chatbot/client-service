@@ -10,10 +10,9 @@ import lombok.Data;
 @Data
 @Builder
 public class DashboardSearchRequest {
-
    private Long clientId;
    private ServiceLogStatus status;
    private TimeFrame timeFrame;
    private String serviceUserOption;
-
+   private Long application;
 }

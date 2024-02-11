@@ -53,30 +53,10 @@ public class DashboardEndpoint {
     public ResponseEntity<?> getDashboardByClientIdAndStatusAndTimeframe(@RequestBody DashboardSearchRequest dashboardSearchRequest) {
         try {
             DashboardDto dashboardDto = new DashboardDto();
-            List<ServiceLog> serviceLogs = dashboardService.getDashboardByClientIdAndStatusAndTimeframe(dashboardSearchRequest);
-
-            Map<String, Integer> statusCountMap = new HashMap<>();
-            Map<Long, Integer> applicationCountMap = new HashMap<>();
-            Map<String, Integer> serviceCountMap = new HashMap<>();
-
-            for (ServiceLog log : serviceLogs) {
-                // Count documents by application
-                applicationCountMap.put(log.getApplication(), applicationCountMap.getOrDefault(log.getApplication(), 0) + 1);
-
-                // Count documents by service name
-                serviceCountMap.put(log.getServiceName(), serviceCountMap.getOrDefault(log.getServiceName(), 0) + 1);
-
-                statusCountMap.put(String.valueOf(log.getStatus()), statusCountMap.getOrDefault(String.valueOf(log.getStatus()), 0) + 1);
-            }
-
-            // Step 2: Calculate the percentage of each application and service name
-            int totalLogs = serviceLogs.size();
+            Map<String, Map<String, Map<String, Map<String, Map<String, Integer>>>>> serviceLogs = dashboardService.getDashboardByClientIdAndStatusAndTimeframe(dashboardSearchRequest);
             dashboardDto.setServiceLogs(serviceLogs);
-            dashboardDto.setServiceCallsByStatus(statusCountMap);
-            dashboardDto.setServiceCallsByApplication(applicationCountMap);
-            dashboardDto.setServiceCallsByServiceOrUser(serviceCountMap);
 
-            System.out.println(dashboardDto.getServiceCallsByStatus());
+            System.out.println(dashboardDto.getServiceLogs());
 
             return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
         }catch (Exception exception){
