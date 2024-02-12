@@ -1,5 +1,5 @@
 package com.voicebot.commondcenter.clientservice.enums;
 
 public enum TimeFrame {
-    currentDay,lastWeek,lastMonth;
+    ALL,DAILY,WEEK,MONTH;
 }

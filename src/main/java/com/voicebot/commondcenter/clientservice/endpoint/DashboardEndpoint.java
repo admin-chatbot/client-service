@@ -3,6 +3,7 @@ package com.voicebot.commondcenter.clientservice.endpoint;
 import com.voicebot.commondcenter.clientservice.dto.DashboardDto;
 import com.voicebot.commondcenter.clientservice.dto.DashboardSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
+import com.voicebot.commondcenter.clientservice.dto.dashboard.ServiceLogs;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.service.DashboardService;
@@ -52,13 +53,61 @@ public class DashboardEndpoint {
 
     public ResponseEntity<?> getDashboardByClientIdAndStatusAndTimeframe(@RequestBody DashboardSearchRequest dashboardSearchRequest) {
         try {
-            DashboardDto dashboardDto = new DashboardDto();
-            Map<String, Map<String, Map<String, Map<String, Map<String, Integer>>>>> serviceLogs = dashboardService.getDashboardByClientIdAndStatusAndTimeframe(dashboardSearchRequest);
-            dashboardDto.setServiceLogs(serviceLogs);
+            ServiceLogs serviceLogs = dashboardService.getServiceLogs(dashboardSearchRequest);
 
-            System.out.println(dashboardDto.getServiceLogs());
+            if(serviceLogs.getDaily()!=null) {
+                serviceLogs.getDaily().forEach(daily -> {
+                    daily.setFail(0);
+                    daily.setSuccess(0);
+                    daily.getData().forEach(applicationData -> {
+                        applicationData.setSuccess(0);
+                        applicationData.setFail(0);
+                        applicationData.getData().forEach(serviceData -> {
+                            applicationData.setSuccess(applicationData.getSuccess() + serviceData.getLogs().getSuccess());
+                            applicationData.setFail(applicationData.getFail() + serviceData.getLogs().getFail());
+                        });
+                        daily.setSuccess( daily.getSuccess() +applicationData.getSuccess());
+                        daily.setFail( daily.getFail() +applicationData.getFail());
+                    });
+                });
+            }
 
-            return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
+            if(serviceLogs.getWeekly()!=null) {
+                serviceLogs.getWeekly().forEach(daily -> {
+                    daily.setFail(0);
+                    daily.setSuccess(0);
+                    daily.getData().forEach(applicationData -> {
+                        applicationData.setSuccess(0);
+                        applicationData.setFail(0);
+                        applicationData.getData().forEach(serviceData -> {
+                            applicationData.setSuccess(applicationData.getSuccess() + serviceData.getLogs().getSuccess());
+                            applicationData.setFail(applicationData.getFail() + serviceData.getLogs().getFail());
+                        });
+                        daily.setSuccess( daily.getSuccess() +applicationData.getSuccess());
+                        daily.setFail( daily.getFail() +applicationData.getFail());
+                    });
+                });
+            }
+
+            if(serviceLogs.getMonthly()!=null) {
+                serviceLogs.getMonthly().forEach(daily -> {
+                    daily.setFail(0);
+                    daily.setSuccess(0);
+                    daily.getData().forEach(applicationData -> {
+                        applicationData.setSuccess(0);
+                        applicationData.setFail(0);
+                        applicationData.getData().forEach(serviceData -> {
+                            applicationData.setSuccess(applicationData.getSuccess() + serviceData.getLogs().getSuccess());
+                            applicationData.setFail(applicationData.getFail() + serviceData.getLogs().getFail());
+                        });
+                        daily.setSuccess( daily.getSuccess() +applicationData.getSuccess());
+                        daily.setFail( daily.getFail() +applicationData.getFail());
+                    });
+                });
+            }
+            System.out.println(serviceLogs);
+
+            return ResponseEntity.ok(ResponseBody.builder().data(serviceLogs).message("").build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
