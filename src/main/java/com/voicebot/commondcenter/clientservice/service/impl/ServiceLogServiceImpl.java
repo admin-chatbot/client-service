@@ -3,8 +3,11 @@ package com.voicebot.commondcenter.clientservice.service.impl;
 import com.voicebot.commondcenter.clientservice.dto.DashboardDto;
 import com.voicebot.commondcenter.clientservice.dto.DashboardSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ServiceCountDto;
+import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
 import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
+import com.voicebot.commondcenter.clientservice.filter.CriteriaBuilder;
+import com.voicebot.commondcenter.clientservice.filter.SearchCriteria;
 import com.voicebot.commondcenter.clientservice.repository.ServiceLogRepository;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.ServiceLogService;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -41,12 +45,32 @@ public class ServiceLogServiceImpl implements ServiceLogService {
         serviceLog.setId(sequenceGeneratorService.generateSequence(ServiceLog.SEQUENCE_NAME));
         serviceLog.setCreatedTimestamp(new Date(System.currentTimeMillis()));
         serviceLog.setModifiedTimestamp(new Date(System.currentTimeMillis()));
+        serviceLog.setLogDate(new Date(System.currentTimeMillis()));
         return serviceLogRepository.save(serviceLog);
     }
 
     @Override
     public List<ServiceLog> get() {
         return serviceLogRepository.findAll();
+    }
+
+    @Override
+    public List<ServiceLog> getServiceClientIdAndBetween2Dates(Long clientId, Date startDate, Date endDate) {
+        CriteriaBuilder criteriaBuilder = new CriteriaBuilder();
+
+        if(clientId!=null
+                && clientId > 0)
+            criteriaBuilder.addCriteria(new SearchCriteria("client","eq", clientId,""));
+
+
+        if(startDate!=null
+                && endDate!=null)
+            criteriaBuilder.addCriteria(new SearchCriteria("logDate","btn","",startDate,endDate));
+
+        Criteria root = criteriaBuilder.build();
+        Query query
+                = new Query(root);
+        return mongoTemplate.find(query, ServiceLog.class);
     }
 
     @Override

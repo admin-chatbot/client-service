@@ -12,7 +12,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class AbstractBaseEntity implements BaseEntity {
 
+    public String createdUserId;
+
     public Date createdTimestamp;
+
+    public String updatedUserId;
 
     public Date modifiedTimestamp;
 }
