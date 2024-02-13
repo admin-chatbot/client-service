@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +64,11 @@ public class DashboardEndpoint {
                         applicationData.setSuccess(0);
                         applicationData.setFail(0);
                         applicationData.getData().forEach(serviceData -> {
-                            applicationData.setSuccess(applicationData.getSuccess() + serviceData.getLogs().getSuccess());
-                            applicationData.setFail(applicationData.getFail() + serviceData.getLogs().getFail());
+                            applicationData.setSuccess(applicationData.getSuccess() + checkNull(serviceData.getLogs().getSuccess()));
+                            applicationData.setFail(applicationData.getFail() + checkNull(serviceData.getLogs().getFail()));
                         });
-                        daily.setSuccess( daily.getSuccess() +applicationData.getSuccess());
-                        daily.setFail( daily.getFail() +applicationData.getFail());
+                        daily.setSuccess( daily.getSuccess() + checkNull(applicationData.getSuccess()));
+                        daily.setFail( daily.getFail() + checkNull(applicationData.getFail()));
                     });
                 });
             }
@@ -80,11 +81,11 @@ public class DashboardEndpoint {
                         applicationData.setSuccess(0);
                         applicationData.setFail(0);
                         applicationData.getData().forEach(serviceData -> {
-                            applicationData.setSuccess(applicationData.getSuccess() + serviceData.getLogs().getSuccess());
-                            applicationData.setFail(applicationData.getFail() + serviceData.getLogs().getFail());
+                            applicationData.setSuccess(applicationData.getSuccess() + checkNull(serviceData.getLogs().getSuccess()));
+                            applicationData.setFail(applicationData.getFail() + checkNull(serviceData.getLogs().getFail()));
                         });
-                        daily.setSuccess( daily.getSuccess() +applicationData.getSuccess());
-                        daily.setFail( daily.getFail() +applicationData.getFail());
+                        daily.setSuccess( daily.getSuccess() + checkNull(applicationData.getSuccess()));
+                        daily.setFail( daily.getFail() + checkNull(applicationData.getFail()));
                     });
                 });
             }
@@ -97,11 +98,11 @@ public class DashboardEndpoint {
                         applicationData.setSuccess(0);
                         applicationData.setFail(0);
                         applicationData.getData().forEach(serviceData -> {
-                            applicationData.setSuccess(applicationData.getSuccess() + serviceData.getLogs().getSuccess());
-                            applicationData.setFail(applicationData.getFail() + serviceData.getLogs().getFail());
+                            applicationData.setSuccess(applicationData.getSuccess() + checkNull(serviceData.getLogs().getSuccess()));
+                            applicationData.setFail(applicationData.getFail() + checkNull(serviceData.getLogs().getFail()));
                         });
-                        daily.setSuccess( daily.getSuccess() +applicationData.getSuccess());
-                        daily.setFail( daily.getFail() +applicationData.getFail());
+                        daily.setSuccess( daily.getSuccess() + checkNull(applicationData.getSuccess()));
+                        daily.setFail( daily.getFail() + checkNull(applicationData.getFail()));
                     });
                 });
             }
@@ -115,4 +116,13 @@ public class DashboardEndpoint {
                     .body(exception.getMessage());
         }
     }
+
+
+    private int checkNull(Integer number) {
+        if(number==null)
+            return 0;
+        return number;
+    }
+
+
 }
