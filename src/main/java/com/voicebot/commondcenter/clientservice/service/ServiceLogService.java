@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -15,6 +16,8 @@ public interface ServiceLogService {
     public ServiceLog save(ServiceLog serviceLog);
 
     public List<ServiceLog> get();
+
+    List<ServiceLog> getServiceClientIdAndBetween2Dates(Long clientId, Date startDate,Date endDate);
 
     public Page<ServiceLog> get(Pageable pageable);
 

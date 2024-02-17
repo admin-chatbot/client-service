@@ -3,6 +3,7 @@ package com.voicebot.commondcenter.clientservice.endpoint;
 import com.voicebot.commondcenter.clientservice.dto.DashboardDto;
 import com.voicebot.commondcenter.clientservice.dto.DashboardSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
+import com.voicebot.commondcenter.clientservice.dto.dashboard.ServiceLogs;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.service.DashboardService;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +54,61 @@ public class DashboardEndpoint {
 
     public ResponseEntity<?> getDashboardByClientIdAndStatusAndTimeframe(@RequestBody DashboardSearchRequest dashboardSearchRequest) {
         try {
-            DashboardDto dashboardDto = new DashboardDto();
-            Map<String, Map<String, Map<String, Map<String, Map<String, Integer>>>>> serviceLogs = dashboardService.getDashboardByClientIdAndStatusAndTimeframe(dashboardSearchRequest);
-            dashboardDto.setServiceLogs(serviceLogs);
+            ServiceLogs serviceLogs = dashboardService.getServiceLogs(dashboardSearchRequest);
 
-            System.out.println(dashboardDto.getServiceLogs());
+            if(serviceLogs.getDaily()!=null) {
+                serviceLogs.getDaily().forEach(daily -> {
+                    daily.setFail(0);
+                    daily.setSuccess(0);
+                    daily.getData().forEach(applicationData -> {
+                        applicationData.setSuccess(0);
+                        applicationData.setFail(0);
+                        applicationData.getData().forEach(serviceData -> {
+                            applicationData.setSuccess(applicationData.getSuccess() + checkNull(serviceData.getLogs().getSuccess()));
+                            applicationData.setFail(applicationData.getFail() + checkNull(serviceData.getLogs().getFail()));
+                        });
+                        daily.setSuccess( daily.getSuccess() + checkNull(applicationData.getSuccess()));
+                        daily.setFail( daily.getFail() + checkNull(applicationData.getFail()));
+                    });
+                });
+            }
 
-            return ResponseEntity.ok(ResponseBody.builder().data(dashboardDto).message("").build());
+            if(serviceLogs.getWeekly()!=null) {
+                serviceLogs.getWeekly().forEach(daily -> {
+                    daily.setFail(0);
+                    daily.setSuccess(0);
+                    daily.getData().forEach(applicationData -> {
+                        applicationData.setSuccess(0);
+                        applicationData.setFail(0);
+                        applicationData.getData().forEach(serviceData -> {
+                            applicationData.setSuccess(applicationData.getSuccess() + checkNull(serviceData.getLogs().getSuccess()));
+                            applicationData.setFail(applicationData.getFail() + checkNull(serviceData.getLogs().getFail()));
+                        });
+                        daily.setSuccess( daily.getSuccess() + checkNull(applicationData.getSuccess()));
+                        daily.setFail( daily.getFail() + checkNull(applicationData.getFail()));
+                    });
+                });
+            }
+
+            if(serviceLogs.getMonthly()!=null) {
+                serviceLogs.getMonthly().forEach(daily -> {
+                    daily.setFail(0);
+                    daily.setSuccess(0);
+                    daily.getData().forEach(applicationData -> {
+                        applicationData.setSuccess(0);
+                        applicationData.setFail(0);
+                        applicationData.getData().forEach(serviceData -> {
+                            applicationData.setSuccess(applicationData.getSuccess() + checkNull(serviceData.getLogs().getSuccess()));
+                            applicationData.setFail(applicationData.getFail() + checkNull(serviceData.getLogs().getFail()));
+                        });
+                        daily.setSuccess( daily.getSuccess() + checkNull(applicationData.getSuccess()));
+                        daily.setFail( daily.getFail() + checkNull(applicationData.getFail()));
+                    });
+                });
+            }
+            System.out.println(serviceLogs);
+
+            return ResponseEntity.ok(ResponseBody.builder().data(serviceLogs).message("").build());
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -66,4 +116,13 @@ public class DashboardEndpoint {
                     .body(exception.getMessage());
         }
     }
+
+
+    private int checkNull(Integer number) {
+        if(number==null)
+            return 0;
+        return number;
+    }
+
+
 }
