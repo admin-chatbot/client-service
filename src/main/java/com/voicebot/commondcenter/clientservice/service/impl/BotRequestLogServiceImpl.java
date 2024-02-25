@@ -1,23 +1,34 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
-import com.voicebot.commondcenter.clientservice.dto.ClientCountDto;
+import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.BotRequestLog;
+import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.repository.BotRequestLogRepository;
+import com.voicebot.commondcenter.clientservice.service.ApplicationService;
 import com.voicebot.commondcenter.clientservice.service.BotRequestLogService;
+import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.*;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import com.voicebot.commondcenter.clientservice.service.BaseService;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @Service
-public class BotRequestLogServiceImpl implements BotRequestLogService {
+public class BotRequestLogServiceImpl implements BotRequestLogService, BaseService<BotRequestLog> {
 
     Logger logger = Logger.getLogger(ServiceLogServiceImpl.class.getName());
 
@@ -26,44 +37,72 @@ public class BotRequestLogServiceImpl implements BotRequestLogService {
 
     @Autowired
     private BotRequestLogRepository botRequestLogRepository;
-    @Override
-    public List<ClientCountDto> getMostActiveClient() {
-        GroupOperation groupByClientId = Aggregation.group("client").count().as("count");
-        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "count"));
-        ProjectionOperation project = Aggregation.project("client", "count");
-        Aggregation aggregation = Aggregation.newAggregation(groupByClientId, sortOperation, project);
-        AggregationResults<ClientCountDto> output = mongoTemplate.aggregate(aggregation, "botrequestlog", ClientCountDto.class);
+    @Autowired
+    SequenceGeneratorService sequenceGeneratorService;
 
-        logger.info("Raw results: {}" + output.getRawResults());
-        logger.info("Mapped results: {}" + output.getMappedResults());
-        return output.getMappedResults().stream().limit(10).toList();
+
+    @Override
+    public BotRequestLogRepository getRepository() {
+        return botRequestLogRepository;
     }
 
     @Override
-    public List<ClientCountDto> getLeastActiveClient() {
-        GroupOperation groupByClientId = Aggregation.group("client").count().as("count");
-        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "count"));
-        ProjectionOperation project = Aggregation.project("client", "count");
-        Aggregation aggregation = Aggregation.newAggregation(groupByClientId, sortOperation, project);
-        AggregationResults<ClientCountDto> output = mongoTemplate.aggregate(aggregation, "botrequestlog", ClientCountDto.class);
+    public List<BotRequestLog> findByExample(Example<BotRequestLog> botRequestLogExample) {
+        System.out.println("Input passed to botRquestLog: " +botRequestLogExample);
+        System.out.println("Output from botRquestLog: " +botRequestLogRepository.findAll(botRequestLogExample).size());
+        return botRequestLogRepository.findAll(botRequestLogExample);
+    }
 
-        logger.info("Raw results: {}" + output.getRawResults());
-        logger.info("Mapped results: {}" + output.getMappedResults());
-        return output.getMappedResults().stream().limit(10).toList();
+    public List<BotRequestLog> findLatestDocumentsForUser(String userName) {
+        GroupOperation groupByRequest = group("requestId")
+                .first("$$ROOT").as("latestDocument");
+
+        Aggregation aggregation = newAggregation(
+                match(where("userName").is(userName)),
+                sort(Sort.Direction.ASC, "requestDate"),
+                groupByRequest,
+                replaceRoot("latestDocument")
+        );
+
+        return mongoTemplate.aggregate(aggregation, "botrequestlog", BotRequestLog.class).getMappedResults();
+    }
+
+
+    @Override
+    public Optional<BotRequestLog> findBotRequestLogByUserAndRequest(String userName, String requestId) {
+        System.out.println("From landing page in BotRequestLog");
+        Example<BotRequestLog> botRequestLogExample = Example.of(BotRequestLog.builder().userName(userName).requestId(requestId).build());
+        return findOneByExample(botRequestLogExample);
+    }
+    @Override
+    public BotRequestLog save(BotRequestLog botRequestLog) {
+        botRequestLog.setId(sequenceGeneratorService.generateSequence(BotRequestLog.SEQUENCE_NAME));
+        return botRequestLogRepository.save(botRequestLog);
     }
 
     @Override
-    public int countOfSuccessCalls() {
-        Criteria criteria = Criteria.where("isSuccess").is(true);
-        Query query = new Query(criteria);
-        List<BotRequestLog> botRequestsSuccess = mongoTemplate.find(query, BotRequestLog.class);
-        return botRequestsSuccess.size();
+    public Page<BotRequestLog> findByExample(Example<BotRequestLog> botRequestLogExample, Pageable pageable) {
+        return null;
     }
 
     @Override
-    public int countOfFailedCalls() {
-        Criteria criteria = Criteria.where("isSuccess").is(false);
-        Query query = new Query(criteria);
-        return mongoTemplate.find(query, BotRequestLog.class).size();
+    public Optional<BotRequestLog> findOneByExample(Example<BotRequestLog> botRequestLogExample) {
+        return Optional.empty();
     }
+
+    @Override
+    public List<BotRequestLog> search(BotRequestLog botRequestLog) {
+        return null;
+    }
+
+    @Override
+    public Page<BotRequestLog> search(BotRequestLog botRequestLog, Pageable pageable) {
+        return null;
+    }
+
+/*    public List<BotRequestLog> findBotRequestLogByName(String name) {
+        System.out.println("username: " +name);
+        System.out.println("Documents with username: " +botRequestLogRepository.findByUserName(name));
+        return botRequestLogRepository.findByUserName(name);
+    }*/
 }

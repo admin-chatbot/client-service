@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.Serializable;
 import java.util.Date;
 
-@Document(collection = "botrequest")
+@Document(collection = "botrequestlog")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
@@ -22,6 +22,8 @@ public class BotRequestLog extends AbstractBaseEntity implements  Serializable {
     @Id
     private Long id;
 
+    private String requestId;
+
     private String userName;
 
     private String question;
@@ -30,12 +32,10 @@ public class BotRequestLog extends AbstractBaseEntity implements  Serializable {
 
     private Date requestDate;
 
-    private Boolean isSuccess;
+    private Boolean isIntentFound;
 
     private Long client;
 
-    private Long application;
-
-    private String serviceEndpoint;
+    private Long serviceLogId;
 
 }
