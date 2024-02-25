@@ -53,12 +53,12 @@ public class BotRequestLogServiceImpl implements BotRequestLogService, BaseServi
         return botRequestLogRepository.findAll(botRequestLogExample);
     }
 
-    public List<BotRequestLog> findLatestDocumentsForUser(String userName) {
+    public List<BotRequestLog> findLatestDocumentsForUser(String userId) {
         GroupOperation groupByRequest = group("requestId")
                 .first("$$ROOT").as("latestDocument");
 
         Aggregation aggregation = newAggregation(
-                match(where("userName").is(userName)),
+                match(where("userId").is(userId)),
                 sort(Sort.Direction.ASC, "requestDate"),
                 groupByRequest,
                 replaceRoot("latestDocument")
@@ -69,9 +69,9 @@ public class BotRequestLogServiceImpl implements BotRequestLogService, BaseServi
 
 
     @Override
-    public Optional<BotRequestLog> findBotRequestLogByUserAndRequest(String userName, String requestId) {
+    public Optional<BotRequestLog> findBotRequestLogByUserAndRequest(String userId, String requestId) {
         System.out.println("From landing page in BotRequestLog");
-        Example<BotRequestLog> botRequestLogExample = Example.of(BotRequestLog.builder().userName(userName).requestId(requestId).build());
+        Example<BotRequestLog> botRequestLogExample = Example.of(BotRequestLog.builder().userId(userId).requestId(requestId).build());
         return findOneByExample(botRequestLogExample);
     }
     @Override
