@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableMongoRepositories
-@EnableScheduling
 @OpenAPIDefinition(info = @Info(title = "Client Service", version = "2.0", description = "Command Center Api"))
 public class ClientServiceApplication {
 	public static void main(String[] args) {

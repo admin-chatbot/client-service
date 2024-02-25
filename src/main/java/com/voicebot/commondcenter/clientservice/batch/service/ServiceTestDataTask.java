@@ -18,7 +18,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-@Component
+
+
+@org.springframework.stereotype.Service
 public class ServiceTestDataTask {
 
     @Autowired
@@ -34,7 +36,7 @@ public class ServiceTestDataTask {
     private ClientService clientService;
 
     Random random = new Random(3);
-    @Scheduled(cron = "*/45 */45 * * * *")
+
     public void task() {
 
         List<Client> clients = clientService.findAll();
