@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,16 +25,19 @@ public class BotRequestLog extends AbstractBaseEntity implements  Serializable {
 
     private String requestId;
 
-    private String userName;
+    private String userId;
 
+    @Field(name = "user_input")
     private String question;
 
     private String response;
 
     private Date requestDate;
 
-    private Boolean isIntentFound;
+    @Field(name = "user_intent")
+    private String intent;
 
+    @Field(name = "client_id")
     private Long client;
 
     private Long serviceLogId;

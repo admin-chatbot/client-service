@@ -103,6 +103,7 @@ public class ApplicationServiceImpl implements ApplicationService, BaseService<A
 
     @Override
     public Optional<Application> findApplicationByClientAndName(Long clientId, String name) {
+        System.out.println("From landing page in Application");
         Example<Application> applicationExample = Example.of(Application.builder().clintId(clientId).name(name).build());
         return findOneByExample(applicationExample);
     }

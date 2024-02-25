@@ -46,7 +46,7 @@ public class BotRequestLogEndpoint {
     @Autowired
     private BotRequestLogServiceImpl botRequestLogService;
 
-    @GetMapping("/{userName}/")
+    @GetMapping("/{userId}/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -57,7 +57,7 @@ public class BotRequestLogEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> getAllBotRequestLogsByUser(@PathVariable(name = "userName") String userName) {
+    public ResponseEntity<?> getAllBotRequestLogsByUser(@PathVariable(name = "userId") String userId) {
         try {
 
 /*
@@ -67,7 +67,7 @@ public class BotRequestLogEndpoint {
 */
 
 
-            List<BotRequestLog> botRequestLogs = botRequestLogService.findLatestDocumentsForUser(userName);
+            List<BotRequestLog> botRequestLogs = botRequestLogService.findLatestDocumentsForUser(userId);
 
 
             return ResponseEntity.ok(ResponseBody.builder()
@@ -80,7 +80,7 @@ public class BotRequestLogEndpoint {
         }
     }
 
-    @GetMapping("/byUser/{userName}/request/{requestId}")
+    @GetMapping("/request/{requestId}")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -91,18 +91,17 @@ public class BotRequestLogEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> getAllBotRequestLogsByUserAndRequest(@PathVariable(name = "userName") String userName,
-                                                                  @PathVariable(name = "requestId") String requestId) {
+    public ResponseEntity<?> getAllBotRequestLogsByUserAndRequest(@PathVariable(name = "requestId") String requestId) {
         try {
 
 
-            BotRequestLog botReqestLog = BotRequestLog.builder().userName(userName).requestId(requestId).build();
+            BotRequestLog botReqestLog = BotRequestLog.builder().requestId(requestId).build();
             Example<BotRequestLog> botRequestLogExample = Example.of(botReqestLog);
             List<BotRequestLog> botRequestLogs = botRequestLogService.findByExample(botRequestLogExample);
 
 
 
-            //List<BotRequestLog> botRequestLogs = botRequestLogService.findLatestDocumentsForUser(userName);
+            //List<BotRequestLog> botRequestLogs = botRequestLogService.findLatestDocumentsForUser(userId);
 
 
             return ResponseEntity.ok(ResponseBody.builder()
