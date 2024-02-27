@@ -85,7 +85,9 @@ public class OpenApiInformationExtractor implements ApiInformationExtractor<Open
 
             service.setParameters(new ArrayList<>());
 
-            service.getParameters().addAll(  operation.getParameters().stream().map(this::buildServiceParameter).toList());
+            if(operation.getParameters()!=null) {
+                service.getParameters().addAll(operation.getParameters().stream().map(this::buildServiceParameter).toList());
+            }
         }
         return service;
     }
