@@ -74,6 +74,12 @@ public class BotRequestLogServiceImpl implements BotRequestLogService, BaseServi
         Example<BotRequestLog> botRequestLogExample = Example.of(BotRequestLog.builder().userId(userId).requestId(requestId).build());
         return findOneByExample(botRequestLogExample);
     }
+
+    @Override
+    public List<BotRequestLog> findBotRequestLogsByRequestId(String requestId) {
+        return botRequestLogRepository.findBotRequestLogByRequestId(requestId);
+    }
+
     @Override
     public BotRequestLog save(BotRequestLog botRequestLog) {
         botRequestLog.setId(sequenceGeneratorService.generateSequence(BotRequestLog.SEQUENCE_NAME));
@@ -87,6 +93,7 @@ public class BotRequestLogServiceImpl implements BotRequestLogService, BaseServi
 
     @Override
     public Optional<BotRequestLog> findOneByExample(Example<BotRequestLog> botRequestLogExample) {
+
         return Optional.empty();
     }
 

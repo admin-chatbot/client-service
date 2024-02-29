@@ -60,16 +60,7 @@ public class BotRequestLogEndpoint {
     public ResponseEntity<?> getAllBotRequestLogsByUser(@PathVariable(name = "userId") String userId) {
         try {
 
-/*
-            BotRequestLog botReqestLog = BotRequestLog.builder().userName(userName).build();
-            Example<BotRequestLog> botRequestLogExample = Example.of(botReqestLog);
-            List<BotRequestLog> botRequestLogs = botRequestLogService.findByExample(botRequestLogExample);
-*/
-
-
             List<BotRequestLog> botRequestLogs = botRequestLogService.findLatestDocumentsForUser(userId);
-
-
             return ResponseEntity.ok(ResponseBody.builder()
                     .message(botRequestLogs!=null? String.valueOf(botRequestLogs.size()) :0+" botRequests found.")
                     .code(HttpStatus.OK.value())
@@ -93,17 +84,7 @@ public class BotRequestLogEndpoint {
     })
     public ResponseEntity<?> getAllBotRequestLogsByUserAndRequest(@PathVariable(name = "requestId") String requestId) {
         try {
-
-
-            BotRequestLog botReqestLog = BotRequestLog.builder().requestId(requestId).build();
-            Example<BotRequestLog> botRequestLogExample = Example.of(botReqestLog);
-            List<BotRequestLog> botRequestLogs = botRequestLogService.findByExample(botRequestLogExample);
-
-
-
-            //List<BotRequestLog> botRequestLogs = botRequestLogService.findLatestDocumentsForUser(userId);
-
-
+            List<BotRequestLog> botRequestLogs = botRequestLogService.findBotRequestLogsByRequestId(requestId);
             return ResponseEntity.ok(ResponseBody.builder()
                     .message(botRequestLogs!=null? String.valueOf(botRequestLogs.size()) :0+" botRequests found.")
                     .code(HttpStatus.OK.value())
