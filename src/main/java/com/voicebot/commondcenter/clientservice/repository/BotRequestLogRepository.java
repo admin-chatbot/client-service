@@ -13,4 +13,6 @@ import java.util.List;
 public interface BotRequestLogRepository extends MongoRepository<BotRequestLog, Long> {
     @Aggregation("{ $match: { userName: ?0 } }, { $sort: { requestDate: -1 } }, { $group: { _id: '$requestId', latestDocument: { $first: '$$ROOT' } } }")
     List<BotRequestLog> findLatestDocumentsForUser(String userName);
+
+    List<BotRequestLog> findBotRequestLogByRequestId(String requestId);
 }

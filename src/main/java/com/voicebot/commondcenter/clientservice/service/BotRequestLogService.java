@@ -24,5 +24,7 @@ public interface BotRequestLogService {
 
      Optional<BotRequestLog> findBotRequestLogByUserAndRequest(String userName, String requestId);
 
+     List<BotRequestLog> findBotRequestLogsByRequestId(String requestId);
+
      public BotRequestLog save(BotRequestLog botRequestLog);
 }
