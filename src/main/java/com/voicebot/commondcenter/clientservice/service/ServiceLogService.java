@@ -3,6 +3,7 @@ package com.voicebot.commondcenter.clientservice.service;
 import com.voicebot.commondcenter.clientservice.dto.DashboardSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ServiceCountDto;
 import com.voicebot.commondcenter.clientservice.entity.ServiceLog;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ public interface ServiceLogService {
     public ServiceLog save(ServiceLog serviceLog);
 
     public List<ServiceLog> get();
+
+    public List<ServiceLog> get(Example<ServiceLog> serviceLogExample);
 
     List<ServiceLog> getServiceClientIdAndBetween2Dates(Long clientId, Date startDate,Date endDate);
 

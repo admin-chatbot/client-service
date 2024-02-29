@@ -13,6 +13,7 @@ import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService
 import com.voicebot.commondcenter.clientservice.service.ServiceLogService;
 import org.springframework.asm.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -52,6 +53,11 @@ public class ServiceLogServiceImpl implements ServiceLogService {
     @Override
     public List<ServiceLog> get() {
         return serviceLogRepository.findAll();
+    }
+
+    @Override
+    public List<ServiceLog> get(Example<ServiceLog> serviceLogExample) {
+        return serviceLogRepository.findAll(serviceLogExample);
     }
 
     @Override
