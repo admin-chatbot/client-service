@@ -22,6 +22,10 @@ public class ResponseBody<I extends Object>  {
         return ResponseBody.builder().code(HttpStatus.BAD_REQUEST.value()).message(message).build();
     }
 
+    public static <I> ResponseBody ok(I data) {
+       return  ResponseBody.builder().code(HttpStatus.OK.value()).data(data).build();
+    }
+
     public static ResponseBody internalServerError(Exception exception) {
         return ResponseBody.builder().code(HttpStatus.INTERNAL_SERVER_ERROR.value()).message(exception.getMessage()).exception(exception).build();
     }

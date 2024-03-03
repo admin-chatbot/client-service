@@ -7,6 +7,7 @@ import com.voicebot.commondcenter.clientservice.dto.dashboard.ServiceLogs;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.service.DashboardService;
+import com.voicebot.commondcenter.clientservice.service.ServiceLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +41,9 @@ public class DashboardEndpoint {
 
     @Autowired
     private DashboardService dashboardService;
+
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     @PostMapping( path = "search" )
     @Operation(parameters = {
@@ -123,6 +128,37 @@ public class DashboardEndpoint {
             return 0;
         return number;
     }
+
+
+    @PostMapping( path = "search/servicelog/" )
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Pageable.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+
+    public ResponseEntity<?> getServiceLogByClientIdAndStatusAndTimeframe(@RequestBody DashboardSearchRequest dashboardSearchRequest) {
+
+        try {
+
+            List<ServiceLog> logs = serviceLogService.getServiceLogsForMonth(dashboardSearchRequest);
+
+            return ResponseEntity.ok().body(ResponseBody.builder().data(logs).code(HttpStatus.OK.value()).build());
+        }catch (Exception exception) {
+            LOGGER.error("",exception);
+            return ResponseEntity.internalServerError().body(
+                    ResponseBody.internalServerError(exception)
+            );
+        }
+
+    }
+
+
 
 
 }

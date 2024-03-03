@@ -13,6 +13,7 @@ import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.entity.ServiceParameter;
 import com.voicebot.commondcenter.clientservice.enums.Status;
+import com.voicebot.commondcenter.clientservice.enums.UserType;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.ServiceService;
 import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
@@ -20,6 +21,7 @@ import com.voicebot.commondcenter.clientservice.service.impl.ApplicationServiceI
 import com.voicebot.commondcenter.clientservice.service.impl.ServiceServiceImpl;
 import com.voicebot.commondcenter.clientservice.service.impl.ServiceParameterServiceImpl;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
+import com.voicebot.commondcenter.clientservice.utils.UserTypeUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -28,6 +30,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -43,6 +46,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,7 +94,7 @@ public class ServiceEndpoint {
 
 
 
-    @GetMapping("/byClient/{id}/status/{status}")
+    @GetMapping("byClient/{id}/status/{status}")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -104,8 +108,27 @@ public class ServiceEndpoint {
     })
     public ResponseEntity<?> getAllServiceByClientIdAndStatus(@PathVariable(name = "id") Long clientId,
                                                               @PathVariable(name = "status") Status status) {
+        return getServiceByClientAndStatus(clientId, status);
+    }
 
+    @GetMapping("status/{status}")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getAllServiceByClientAndStatus(@PathVariable(name = "status") Status status,
+                                                            @RequestAttribute(value = "id") Long id) {
+        return getServiceByClientAndStatus(id, status);
+    }
 
+    private ResponseEntity<?> getServiceByClientAndStatus(Long clientId, Status status) {
         try {
 
             Service service = Service.builder().clientId(clientId).status(status).build();
@@ -120,7 +143,7 @@ public class ServiceEndpoint {
 
             });
             return ResponseEntity.ok(ResponseBody.builder()
-                    .message(services!=null? String.valueOf(services.size()) :0+" services found.")
+                    .message(services != null ? String.valueOf(services.size()) : 0 + " services found.")
                     .code(HttpStatus.OK.value())
                     .data(services)
                     .build());
@@ -133,8 +156,7 @@ public class ServiceEndpoint {
     }
 
 
-
-    @GetMapping(path="{clientId}/")
+    @GetMapping(path="byClient/{clientId}/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -147,11 +169,31 @@ public class ServiceEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
     public ResponseEntity<?> getAllServiceByClientId(@PathVariable(name="clientId") Long clientId) {
+        return getServiceByClient(clientId);
+    }
+
+    @GetMapping(path="byClient/")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getAllServiceByClient(@RequestAttribute(value = "id") Long id) {
+        return getServiceByClient(id);
+    }
+
+    private ResponseEntity<?> getServiceByClient(Long clientId) {
         try {
             LOGGER.info("getAllServiceByClientId");
             List<Service> services = serviceService.findAllByClientId(clientId);
             return ResponseEntity.ok(ResponseBody.builder()
-                    .message(services!=null? String.valueOf(services.size()) :0+" services found.")
+                    .message(services != null ? String.valueOf(services.size()) : 0 + " services found.")
                     .code(HttpStatus.OK.value())
                     .data(services)
                     .build());
@@ -175,7 +217,7 @@ public class ServiceEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
-    public ResponseEntity<?> getServiceByApplicationId(@PathVariable(name="id") Long id) {
+    public ResponseEntity<?> getServiceByApplicationId(@PathVariable(value="id") Long id) {
         try {
             LOGGER.info("getServiceByApplicationId");
             List<Service> services = serviceService.findAllByApplicationId(id);
@@ -207,27 +249,50 @@ public class ServiceEndpoint {
     })
     public ResponseEntity<?> getServiceByClientAndKeyword( @PathVariable(value = "clientId") Long clientId,
                                                            @RequestParam(value = "keyword") String keyword) {
+        return getSerByClientAndKeyword(clientId, keyword);
+    }
+
+
+    @GetMapping(path="keyword")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getServiceByKeyword( @RequestAttribute(value = "id") Long clientId,
+                                                           @RequestParam(value = "keyword") String keyword) {
+        return getSerByClientAndKeyword(clientId, keyword);
+    }
+
+
+    private ResponseEntity<ResponseBody<Object>> getSerByClientAndKeyword(Long clientId, String keyword) {
         try{
             if(StringUtils.isBlank(keyword)) {
-                return ResponseEntity.badRequest().body( ResponseBody.builder()
+                return ResponseEntity.badRequest().body(ResponseBody.builder()
                         .message("Bad Request : keyword is missing.")
                         .code(HttpStatus.BAD_REQUEST.value())
-                        .build() );
+                        .build());
             }
 
-            List<Service> services = serviceService.findServiceByClientIdAndKeywordLike(clientId,keyword);
+            List<Service> services = serviceService.findServiceByClientIdAndKeywordLike(clientId, keyword);
             return ResponseEntity.ok(ResponseBody.builder()
-                    .message(services!=null? String.valueOf(services.size()) :0+" services found.")
+                    .message(services != null ? String.valueOf(services.size()) : 0 + " services found.")
                     .code(HttpStatus.OK.value())
                     .data(services)
                     .build());
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
-            return ResponseEntity.internalServerError().body( ResponseBody.builder()
+            return ResponseEntity.internalServerError().body(ResponseBody.builder()
                     .message(exception.getMessage())
                     .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .exception(exception)
-                    .build()  );
+                    .build());
         }
     }
 
@@ -243,15 +308,23 @@ public class ServiceEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
-    public ResponseEntity<?> save(@RequestBody @Valid Service service) {
+    public ResponseEntity<?> save(@RequestBody @Valid Service service,
+                                  @RequestAttribute(value = "id") Long clientId,
+                                  @RequestAttribute(name = "type") String type) {
         try {
             LOGGER.info("Client {} ",service);
-            Service c =  serviceService.save(service);
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message("")
-                    .code(HttpStatus.OK.value())
-                    .data(c)
-                    .build());
+
+            if(service.getClientId().equals(clientId)
+                    || UserTypeUtils.isSuperAdmin(type)) {
+                Service c = serviceService.save(service);
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message("")
+                        .code(HttpStatus.OK.value())
+                        .data(c)
+                        .build());
+            } else {
+                return ResponseEntity.ok(ResponseBody.badRequest("UnAuthorize Request."));
+            }
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()
@@ -275,33 +348,42 @@ public class ServiceEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
-    public ResponseEntity<?> edit(@RequestBody @Valid Service service) {
+    public ResponseEntity<?> edit(@RequestBody @Valid Service service,
+                                  @RequestAttribute(value = "id") Long clientId,
+                                  @RequestAttribute(name = "type") String type) {
         try {
             LOGGER.info("Client {} ",service);
 
-            if( service == null){
-                return ResponseEntity.badRequest().body( ResponseBody.builder()
+            if (service == null) {
+                return ResponseEntity.badRequest().body(ResponseBody.builder()
                         .code(HttpStatus.BAD_REQUEST.value())
-                        .build() );
+                        .build());
             }
 
-             if(service.getId()==null) {
-                 return ResponseEntity.badRequest().body( ResponseBody.builder()
-                         .message("Service Id Should not be null.")
-                         .code(HttpStatus.PARTIAL_CONTENT.value())
-                         .build() );
-             }
+            if(service.getClientId().equals(clientId)
+                    || UserTypeUtils.isSuperAdmin(type)) {
 
-            Optional<Service> serviceFromDb = serviceService.fetchOne(service.getId());
+                if (service.getId() == null) {
+                    return ResponseEntity.badRequest().body(ResponseBody.builder()
+                            .message("Service Id Should not be null.")
+                            .code(HttpStatus.PARTIAL_CONTENT.value())
+                            .build());
+                }
 
-             if(serviceFromDb.isEmpty()) {
-                 return ResponseEntity.badRequest().body( ResponseBody.builder()
-                         .message("Service is not valid ")
-                         .code(HttpStatus.BAD_REQUEST.value())
-                         .build() );
-             }
-            Service c =  serviceService.edit(service);
-            return ResponseEntity.ok(ResponseBody.builder().data(c).message("Service successfully updated.").code(HttpStatus.OK.value()).build());
+                Optional<Service> serviceFromDb = serviceService.fetchOne(service.getId());
+
+                if (serviceFromDb.isEmpty()) {
+                    return ResponseEntity.badRequest().body(ResponseBody.builder()
+                            .message("Service is not valid ")
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .build());
+                }
+                Service c = serviceService.edit(service);
+                return ResponseEntity.ok(ResponseBody.builder().data(c).message("Service successfully updated.").code(HttpStatus.OK.value()).build());
+            } else {
+                return ResponseEntity.ok(ResponseBody.badRequest("UnAuthorize Request."));
+            }
+
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()
@@ -325,12 +407,23 @@ public class ServiceEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseEntity.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> search(@RequestBody ServiceSearchRequest searchRequest ) {
+    public ResponseEntity<?> search(@RequestBody ServiceSearchRequest searchRequest ,
+                                    @RequestAttribute(value = "id") Long clientId,
+                                    @RequestAttribute(name = "type") String type) {
         try {
-            List<Service> services =  serviceService.search(searchRequest);
+            List<Service> services = null;
+            if (UserTypeUtils.isSuperAdmin(type)) {
+                services = serviceService.search(searchRequest);
+            } else {
+                searchRequest.setClientId(clientId);
+                services = serviceService.search(searchRequest);
+            }
+
+            if(services ==null)
+                services = new ArrayList<>();
             return ResponseBuilder.ok("",services);
         }catch (Exception exception) {
-            exception.printStackTrace();
+            LOGGER.error(exception.getMessage(),exception);
             return ResponseBuilder.build500(exception);
         }
     }

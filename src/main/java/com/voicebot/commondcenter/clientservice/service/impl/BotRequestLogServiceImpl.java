@@ -54,11 +54,11 @@ public class BotRequestLogServiceImpl implements BotRequestLogService, BaseServi
     }
 
     public List<BotRequestLog> findLatestDocumentsForUser(String userId) {
-        GroupOperation groupByRequest = group("requestId")
+            GroupOperation groupByRequest = group("requestId")
                 .first("$$ROOT").as("latestDocument");
 
         Aggregation aggregation = newAggregation(
-                match(where("userId").is(userId)),
+                match(where("user_id").is(userId)),
                 sort(Sort.Direction.ASC, "requestDate"),
                 groupByRequest,
                 replaceRoot("latestDocument")

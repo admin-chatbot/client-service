@@ -13,5 +13,5 @@ public interface ClientRepository extends MongoRepository<Client, Long> {
 
     public Optional<Client> findClientByEmail(String email);
 
-    public Optional<Client> findByToken(String token);
+    Optional<Client> findClientByAuthenticationId(Long authenticationId);
 }

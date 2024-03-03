@@ -10,6 +10,7 @@ import com.voicebot.commondcenter.clientservice.entity.User;
 import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.service.UserService;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
+import com.voicebot.commondcenter.clientservice.utils.UserTypeUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,7 +152,7 @@ public class UserEndpoint {
     }
 
 
-    @GetMapping(path="{clientId}/")
+    @GetMapping(path="byClient/{clientId}/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -163,11 +165,31 @@ public class UserEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
     public ResponseEntity<?> getUserByClientId(@PathVariable(name="clientId") Long clientId) {
+        return getUsrByClient(clientId);
+    }
+
+    @GetMapping(path="byClient/")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = User.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getUserByClient(@RequestAttribute(name="id") Long clientId) {
+        return getUsrByClient(clientId);
+    }
+
+    private ResponseEntity<?> getUsrByClient(Long clientId) {
         try {
-            LOGGER.info("getAllServiceByClientId");
+            LOGGER.info("getUserByClientId");
             List<User> users = userService.findUsersByClientId(clientId);
             return ResponseEntity.ok(ResponseBody.builder()
-                    .message(users!=null? String.valueOf(users.size()) :0+" user found.")
+                    .message(users != null ? String.valueOf(users.size()) : 0 + " user found.")
                     .code(HttpStatus.OK.value())
                     .data(users)
                     .build());
@@ -179,7 +201,7 @@ public class UserEndpoint {
         }
     }
 
-    @GetMapping(path="{clientId}/page")
+    @GetMapping(path="byClient/{clientId}/page")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -192,9 +214,29 @@ public class UserEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
     public ResponseEntity<?> getUserByClientId(@PathVariable(name="clientId") Long clientId, Pageable pageable) {
+        return getUsrByClient(clientId, pageable);
+    }
+
+    @GetMapping(path="byClient/page")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = User.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getUserByClient(@RequestAttribute(name="id") Long clientId, Pageable pageable) {
+        return getUsrByClient(clientId, pageable);
+    }
+
+    private ResponseEntity<?> getUsrByClient(Long clientId, Pageable pageable) {
         try {
             LOGGER.info("getAllServiceByClientId");
-            Page<User> users = userService.findUsersByClientId(clientId,pageable);
+            Page<User> users = userService.findUsersByClientId(clientId, pageable);
             return ResponseEntity.ok(users);
         }catch (Exception exception){
             LOGGER.error("",exception);
@@ -217,15 +259,31 @@ public class UserEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
-    public ResponseEntity<?> getUsers() {
+    public ResponseEntity<?> getUsers( @RequestAttribute(name = "id") Long id,
+                                       @RequestAttribute(name = "type") String type ) {
         try {
-            LOGGER.info("getAllServiceByClientId");
-            List<User> users = userService.getRepository().findAll();
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message(String.valueOf(users.size()))
-                    .code(HttpStatus.OK.value())
-                    .data(users)
-                    .build());
+            LOGGER.info("getUsers");
+            if(UserTypeUtils.isSuperAdmin(type)) {
+                List<User> users = userService.getRepository().findAll();
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message(String.valueOf(users.size()))
+                        .code(HttpStatus.OK.value())
+                        .data(users)
+                        .build());
+            } else if (UserTypeUtils.isClientAdmin(type)) {
+                List<User> users = userService.getRepository().findUsersByClientId(id);
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message(String.valueOf(users.size()))
+                        .code(HttpStatus.OK.value())
+                        .data(users)
+                        .build());
+            } else {
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message("")
+                        .code(HttpStatus.OK.value())
+                        .data(userService.findById(id))
+                        .build());
+            }
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -246,11 +304,32 @@ public class UserEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
-    public ResponseEntity<?> getUsers(Pageable pageable) {
+    public ResponseEntity<?> getUsers(@RequestAttribute(name = "id") Long id,
+                                      @RequestAttribute(name = "type") String type,
+                                      Pageable pageable) {
         try {
-            LOGGER.info("getAllServiceByClientId");
-            Page<User> users = userService.getRepository().findAll(pageable);
-            return ResponseEntity.ok(users);
+            LOGGER.info("getUsers");
+            if(UserTypeUtils.isSuperAdmin(type)) {
+                Page<User> users = userService.getRepository().findAll(pageable);
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message(String.valueOf(users.getSize()))
+                        .code(HttpStatus.OK.value())
+                        .data(users)
+                        .build());
+            } else if (UserTypeUtils.isClientAdmin(type)) {
+                Page<User> users = userService.getRepository().findUsersByClientId(id,pageable);
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message(String.valueOf(users.getSize()))
+                        .code(HttpStatus.OK.value())
+                        .data(users)
+                        .build());
+            } else {
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message("")
+                        .code(HttpStatus.OK.value())
+                        .data(userService.findById(id))
+                        .build());
+            }
         }catch (Exception exception){
             LOGGER.error("",exception);
             return ResponseEntity
@@ -270,17 +349,27 @@ public class UserEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseEntity.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> search(@RequestBody UserSearchRequest searchRequest ) {
+    public ResponseEntity<?> search(@RequestBody UserSearchRequest searchRequest ,
+                                    @RequestAttribute(value = "id") Long clientId,
+                                    @RequestAttribute(name = "type") String type) {
         try {
-            List<User> users =  userService.search(searchRequest);
+            List<User> users = null;
+            if (UserTypeUtils.isSuperAdmin(type)) {
+                 users = userService.search(searchRequest);
+            } else if (UserTypeUtils.isClientAdmin(type)) {
+                searchRequest.setClientId(clientId);
+                users = userService.search(searchRequest);
+            }else {
+                users = new ArrayList<>();
+            }
             return ResponseBuilder.ok("",users);
         }catch (Exception exception) {
-            exception.printStackTrace();
+            LOGGER.error(exception.getMessage(),exception);
             return ResponseBuilder.build500(exception);
         }
     }
 
-    @GetMapping("/byClient/{id}/status/{status}")
+    @GetMapping("byClient/{id}/status/{status}")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -293,6 +382,26 @@ public class UserEndpoint {
     })
     public ResponseEntity<?> getAllApplicationByClientIdAndStatus(@PathVariable(name = "id") Long clientId,
                                                                   @PathVariable(name = "status") Status status) {
+        return getUsrByClientAndStatus(clientId, status);
+    }
+
+    @GetMapping("status/{status}")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> getUserByClientIdAndStatus(@RequestAttribute(name = "id") Long clientId,
+                                                                  @PathVariable(name = "status") Status status) {
+        return getUsrByClientAndStatus(clientId, status);
+    }
+
+    private ResponseEntity<?> getUsrByClientAndStatus(Long clientId, Status status) {
         try {
 
             User user = User.builder().clientId(clientId).status(status).build();
@@ -300,7 +409,7 @@ public class UserEndpoint {
 
             List<User> users = userService.findByExample(userExample);
             return ResponseEntity.ok(ResponseBody.builder()
-                    .message(users!=null? String.valueOf(users.size()) :0+" user found.")
+                    .message(users != null ? String.valueOf(users.size()) : 0 + " user found.")
                     .code(HttpStatus.OK.value())
                     .data(users)
                     .build());

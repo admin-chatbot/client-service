@@ -12,7 +12,7 @@ import java.util.Date;
 @Builder
 public class UserSearchRequest {
 
-   private int clientId;
+   private Long clientId;
    private String empId;
    private String name;
    private int mobile;

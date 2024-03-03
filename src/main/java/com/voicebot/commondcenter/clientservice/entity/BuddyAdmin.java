@@ -1,40 +1,32 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.voicebot.commondcenter.clientservice.enums.Status;
-import com.voicebot.commondcenter.clientservice.utils.ObjectIdJsonSerializer;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-@Document(collection = "client")
+@Document(collection = "buddyadmin")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Client extends AbstractBaseEntity implements  Serializable {
+public class BuddyAdmin extends AbstractBaseEntity implements Serializable {
 
     @Transient
-    public static final String SEQUENCE_NAME = "client_sequence";
-
+    public static final String SEQUENCE_NAME = "buddy_admin_sequence";
     @Id
     private Long id;
 
-    @NotBlank(message = "Client Name should not null or empty.")
-    private String clientName;
+    @NotBlank(message = "Name should not null or empty.")
+    private String name;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", locale = "en-PH")
     private Date registerDate;
@@ -48,20 +40,6 @@ public class Client extends AbstractBaseEntity implements  Serializable {
     @NotBlank(message = "Contact Details is mandatory.")
     private String contactNumber;
 
-    private Double turnover;
-
-    private int employeeCount;
-
-    private Status status;
-
-    private String gstNumber;
-
-    private List<ContactPerson> contactPerson;
-
-    @Transient
-    private ArrayList<Service> services;
-
     @NotBlank(message = "Id should not null or empty.")
     private Long authenticationId;
-
 }

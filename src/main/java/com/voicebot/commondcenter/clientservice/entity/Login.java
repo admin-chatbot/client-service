@@ -12,8 +12,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Login extends AbstractBaseEntity implements  Serializable {
-
     private String email;
-
     private String password;
 }

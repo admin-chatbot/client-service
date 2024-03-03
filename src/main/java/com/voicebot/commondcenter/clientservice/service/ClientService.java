@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.service;
 
+import com.voicebot.commondcenter.clientservice.entity.Authentication;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Login;
 import com.voicebot.commondcenter.clientservice.exception.EmailAlreadyRegistered;
@@ -20,9 +21,11 @@ public interface ClientService {
 
     Client save(Client client);
 
+    Optional<Client> findClientByEmail(String email);
+
     Client register(Client client) throws EmailAlreadyRegistered;
 
-    Client login(Login login) throws InvalidUserNameAndPassword;
+    Optional<Client> findByAuthenticationId(Long aLong);
 
-    Optional<Client> authenticate(String accessToken) throws TokenNotFoundException;
+
 }

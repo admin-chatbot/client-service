@@ -68,8 +68,6 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     public ResponseEntity<?> onBoard(@RequestBody @Valid Application application){
         try {
-
-
             Optional<Client> client = clientService.findOne(application.getClintId());
 
             if(client.isEmpty()) {
@@ -79,9 +77,6 @@ public class ApplicationEndpoint {
             if(alreadyPresent.isPresent()) {
                 return ResponseBuilder.build400("Application is already onboarded.");
             }
-
-
-
             Application application1 = applicationService.onBoard(application);
 
             return ResponseBuilder.ok("Application successfully onboard.",application1);
