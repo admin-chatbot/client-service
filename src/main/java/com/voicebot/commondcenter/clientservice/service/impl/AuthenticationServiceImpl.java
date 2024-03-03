@@ -80,7 +80,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Authentication register(Authentication authentication) {
         authentication.setCreatedTimestamp(new Date(System.currentTimeMillis()));
         authentication.setModifiedTimestamp(new Date(System.currentTimeMillis()));
-        authentication.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
+        authentication.setId(sequenceGeneratorService.generateSequence(Authentication.SEQUENCE_NAME));
         return authenticationRepository.save(authentication);
     }
 
@@ -199,7 +199,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .email(authentication.getUserName())
                     .authenticationId(registerUser.getId())
                     .build();
-            buddyAdmin.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
+            buddyAdmin.setId(sequenceGeneratorService.generateSequence(BuddyAdmin.SEQUENCE_NAME));
             buddyAdmin.setCreatedTimestamp(new Date(System.currentTimeMillis()));
 
             return buddyAdminService.save(buddyAdmin);
