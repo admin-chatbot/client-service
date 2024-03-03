@@ -1,18 +1,17 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
-import com.voicebot.commondcenter.clientservice.entity.Authentication;
-import com.voicebot.commondcenter.clientservice.entity.BuddyAdmin;
-import com.voicebot.commondcenter.clientservice.entity.Client;
-import com.voicebot.commondcenter.clientservice.entity.Login;
+import com.voicebot.commondcenter.clientservice.entity.*;
+import com.voicebot.commondcenter.clientservice.enums.UserType;
+import com.voicebot.commondcenter.clientservice.exception.EmailAlreadyRegistered;
 import com.voicebot.commondcenter.clientservice.exception.InvalidUserNameAndPassword;
 import com.voicebot.commondcenter.clientservice.exception.TokenNotFoundException;
 import com.voicebot.commondcenter.clientservice.repository.AuthenticationRepository;
-import com.voicebot.commondcenter.clientservice.service.AuthenticationService;
-import com.voicebot.commondcenter.clientservice.service.BaseService;
-import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
+import com.voicebot.commondcenter.clientservice.service.*;
 import com.voicebot.commondcenter.clientservice.utils.EncryptDecryptPassword;
 import com.voicebot.commondcenter.clientservice.utils.SecureTokenGenerator;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -28,9 +27,18 @@ import java.util.Optional;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
-
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
     @Autowired
     AuthenticationRepository authenticationRepository;
+
+    @Autowired
+    ClientServiceImpl clientService;
+
+    @Autowired
+    private BuddyAdminService buddyAdminService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     SequenceGeneratorService sequenceGeneratorService;
@@ -86,7 +94,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if(StringUtils.isBlank(accessToken))
             throw new TokenNotFoundException();
 
-        return authenticationRepository.findAuthenticationByToken(accessToken);
+        Optional<Authentication> optionalAuthentication = authenticationRepository.findAuthenticationByToken(accessToken);
+
+        if(optionalAuthentication.isPresent()) {
+            Authentication authentication = optionalAuthentication.get();
+
+            if(authentication.getUserType().equals(UserType.SUPER_ADMIN)) {
+                Optional<BuddyAdmin> buddyAdmin = buddyAdminService.findOneByAuthenticationId(authentication.getId());
+                if(buddyAdmin.isEmpty())
+                    return Optional.empty();
+                authentication.setEntityId(buddyAdmin.get().getId());
+            } else if (authentication.getUserType().equals(UserType.CLIENT_ADMIN)) {
+                Optional<Client> optionalClient = clientService.findByAuthenticationId(authentication.getId());
+                if (optionalClient.isEmpty())
+                    return Optional.empty();
+                authentication.setEntityId(optionalClient.get().getId());
+            } else if (authentication.getUserType().equals(UserType.USER)) {
+                //Optional<User> optionalUser = userService.
+                return Optional.empty();
+            }
+        }
+
+        return Optional.empty();
     }
 
 
@@ -114,4 +143,72 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Page<Authentication> search(Authentication authentication, Pageable pageable) {
         return null;
     }
+
+
+
+    public Client registerClient(Authentication authentication) throws Exception {
+
+        Example<Authentication> findByEmailExample = Example.of(Authentication.builder().userName(authentication.getUserName()).build());
+        Optional<Authentication> optionalAuthentication =  findOneByExample(findByEmailExample);
+        if(optionalAuthentication.isPresent())
+            throw new EmailAlreadyRegistered("Email is already link with another user");
+
+        Optional<Client> alreadyPresent = clientService.findClientByEmail(authentication.getUserName());
+        if (alreadyPresent.isPresent()) {
+            throw new EmailAlreadyRegistered();
+        }
+        try {
+
+            Authentication registerUser = register(authentication);
+
+            Client client = Client.builder().build();
+            client.setRegisterDate(new java.sql.Date(System.currentTimeMillis()));
+            client.setClientName(authentication.getName());
+            client.setEmail(authentication.getUserName());
+            client.setContactNumber(authentication.getMobileNumber());
+            client.setAuthenticationId(registerUser.getId());
+
+            return clientService.register(client);
+        }catch (Exception exception) {
+            logger.error(exception.getMessage(),exception);
+            throw new Exception("Unable to register.Please try after some time.");
+        }
+
+    }
+
+    @Override
+    public BuddyAdmin registerBuddyAdmin(Authentication authentication) throws Exception {
+        Example<Authentication> findByEmailExample = Example.of(Authentication.builder().userName(authentication.getUserName()).build());
+        Optional<Authentication> optionalAuthentication =  findOneByExample(findByEmailExample);
+        if(optionalAuthentication.isPresent())
+            throw new EmailAlreadyRegistered("Email is already link with another user");
+
+
+        Example<BuddyAdmin> findBuddyAdminByEmailExample = Example.of(BuddyAdmin.builder().email(authentication.getUserName()).build());
+        Optional<BuddyAdmin> optionalBuddyAdmin = buddyAdminService.findBuddyAdminByEmail(authentication.getUserName());
+        if(optionalBuddyAdmin.isPresent())
+            throw new EmailAlreadyRegistered("Email is already link with another user");
+
+        try{
+
+            Authentication registerUser = register(authentication);
+
+            BuddyAdmin buddyAdmin = BuddyAdmin.builder()
+                    .name(authentication.getName())
+                    .contactNumber(authentication.getMobileNumber())
+                    .email(authentication.getUserName())
+                    .authenticationId(registerUser.getId())
+                    .build();
+            buddyAdmin.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
+            buddyAdmin.setCreatedTimestamp(new Date(System.currentTimeMillis()));
+
+            return buddyAdminService.save(buddyAdmin);
+
+        }catch (Exception exception) {
+            logger.error(exception.getMessage(),exception);
+            throw new Exception("Unable to register.Please try after some time.");
+        }
+    }
+
+
 }

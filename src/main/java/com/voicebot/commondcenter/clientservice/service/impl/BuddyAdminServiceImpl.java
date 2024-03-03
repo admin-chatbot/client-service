@@ -29,10 +29,6 @@ public class BuddyAdminServiceImpl implements BuddyAdminService, BaseService<Bud
 
     @Autowired
     private BuddyAdminRepository buddyAdminRepository;
-
-    @Autowired
-    private AuthenticationService authenticationService;
-
     @Autowired
     SequenceGeneratorService sequenceGeneratorService;
 
@@ -53,45 +49,13 @@ public class BuddyAdminServiceImpl implements BuddyAdminService, BaseService<Bud
     }
 
     @Override
-    public BuddyAdmin register(Authentication authentication) throws Exception {
-
-        Example<Authentication> findByEmailExample = Example.of(Authentication.builder().userName(authentication.getUserName()).build());
-        Optional<Authentication> optionalAuthentication =  authenticationService.findOneByExample(findByEmailExample);
-        if(optionalAuthentication.isPresent())
-            throw new EmailAlreadyRegistered("Email is already link with another user");
-
-
-        Example<BuddyAdmin> findBuddyAdminByEmailExample = Example.of(BuddyAdmin.builder().email(authentication.getUserName()).build());
-        Optional<BuddyAdmin> optionalBuddyAdmin = findOneByExample(findBuddyAdminByEmailExample);
-        if(optionalBuddyAdmin.isPresent())
-            throw new EmailAlreadyRegistered("Email is already link with another user");
-
-        try{
-
-            Authentication registerUser = authenticationService.register(authentication);
-
-            BuddyAdmin buddyAdmin = BuddyAdmin.builder()
-                    .name(authentication.getName())
-                    .contactNumber(authentication.getMobileNumber())
-                    .email(authentication.getUserName())
-                    .authenticationId(registerUser.getId())
-                    .build();
-            buddyAdmin.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
-            buddyAdmin.setCreatedTimestamp(new Date(System.currentTimeMillis()));
-
-            return save(buddyAdmin);
-
-        }catch (Exception exception) {
-            logger.error(exception.getMessage(),exception);
-            throw new Exception("Unable to register.Please try after some time.");
-        }
-
-
+    public Optional<BuddyAdmin> findOneByAuthenticationId(Long id) {
+        return buddyAdminRepository.findBuddyAdminByAuthenticationId(id);
     }
 
     @Override
-    public Optional<BuddyAdmin> findOneByAuthenticationId(Long id) {
-        return buddyAdminRepository.findBuddyAdminByAuthenticationId(id);
+    public Optional<BuddyAdmin> findBuddyAdminByEmail(String email) {
+        return buddyAdminRepository.findBuddyAdminByEmail(email);
     }
 
     @Override

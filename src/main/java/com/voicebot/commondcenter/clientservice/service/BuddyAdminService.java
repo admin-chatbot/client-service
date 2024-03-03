@@ -17,8 +17,7 @@ public interface BuddyAdminService {
     Optional<BuddyAdmin> findOne(Long id);
 
     BuddyAdmin save(BuddyAdmin buddyAdmin);
-
-    BuddyAdmin register(Authentication authentication) throws Exception;
-
     Optional<BuddyAdmin> findOneByAuthenticationId(Long id);
+
+    Optional<BuddyAdmin> findBuddyAdminByEmail(String email);
 }

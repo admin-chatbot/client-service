@@ -36,11 +36,7 @@ public class ClientServiceImpl implements ClientService {
     private ClientRepository clientRepository;
 
     @Autowired
-    private AuthenticationService authenticationService;
-
-    @Autowired
     SequenceGeneratorService sequenceGeneratorService;
-
 
     @Override
     public List<Client> findAll() {
@@ -58,9 +54,14 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    public Optional<Client> findClientByEmail(String email) {
+        return clientRepository.findClientByEmail(email);
+    }
+
+    @Override
     public Client register(Client client) throws EmailAlreadyRegistered {
 
-        Optional<Client> alreadyPresent = clientRepository.findClientByEmail(client.getEmail());
+        Optional<Client> alreadyPresent = findClientByEmail(client.getEmail());
         if (alreadyPresent.isPresent()) {
             throw new EmailAlreadyRegistered();
         }
@@ -70,36 +71,6 @@ public class ClientServiceImpl implements ClientService {
         return clientRepository.save(client);
     }
 
-    @Override
-    public Client register(Authentication authentication) throws Exception {
-
-        Example<Authentication> findByEmailExample = Example.of(Authentication.builder().userName(authentication.getUserName()).build());
-        Optional<Authentication> optionalAuthentication =  authenticationService.findOneByExample(findByEmailExample);
-        if(optionalAuthentication.isPresent())
-            throw new EmailAlreadyRegistered("Email is already link with another user");
-
-        Optional<Client> alreadyPresent = clientRepository.findClientByEmail(authentication.getUserName());
-        if (alreadyPresent.isPresent()) {
-            throw new EmailAlreadyRegistered();
-        }
-        try {
-
-            Authentication registerUser = authenticationService.register(authentication);
-
-            Client client = Client.builder().build();
-            client.setRegisterDate(new Date(System.currentTimeMillis()));
-            client.setClientName(authentication.getName());
-            client.setEmail(authentication.getUserName());
-            client.setContactNumber(authentication.getMobileNumber());
-            client.setAuthenticationId(registerUser.getId());
-
-            return register(client);
-        }catch (Exception exception) {
-            logger.error(exception.getMessage(),exception);
-            throw new Exception("Unable to register.Please try after some time.");
-        }
-
-    }
 
     @Override
     public Optional<Client> findByAuthenticationId(Long id) {

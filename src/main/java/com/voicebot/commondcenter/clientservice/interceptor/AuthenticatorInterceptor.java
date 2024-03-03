@@ -109,9 +109,10 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
             } else {
                 isValid = true;
                 Optional<Client> client = clientService.findOne(authentication.get().getEntityId());
-                request.setAttribute("userId", client.get().getEmail());
-                request.setAttribute("username", client.get().getClientName());
-                request.setAttribute("clientId",client.get().getId());
+                request.setAttribute("userId", authentication.get().getUserName());
+                request.setAttribute("name", authentication.get().getName());
+                request.setAttribute("id",authentication.get().getEntityId());
+                request.setAttribute("type",authentication.get().getUserType());
             }
         }
 

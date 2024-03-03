@@ -108,10 +108,27 @@ public class ServiceLogEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = ResponseBody.class),mediaType = MediaType.APPLICATION_JSON_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class),mediaType = MediaType.APPLICATION_JSON_VALUE) })
     })
-    public ResponseEntity<?> getLogByClientId(HttpServletRequest request) {
-        try {
+    public ResponseEntity<?> getLogByClientId(@RequestAttribute(name = "id") Long clientId ) {
+        return getLogsByClient(clientId);
+    }
 
-          Long clientId = (Long) request.getAttribute("clientId");
+    @GetMapping(path = "byClient/{id}")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = ResponseBody.class),mediaType = MediaType.APPLICATION_JSON_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class),mediaType = MediaType.APPLICATION_JSON_VALUE) })
+    })
+    public ResponseEntity<?> getLogByClient(@PathVariable(name = "id") Long clientId ) {
+        return getLogsByClient(clientId);
+    }
+
+    private ResponseEntity<?> getLogsByClient(Long clientId) {
+        try {
 
           Example<ServiceLog> serviceLogExample = Example.of(ServiceLog.builder().client(clientId).build());
 
@@ -120,7 +137,7 @@ public class ServiceLogEndpoint {
           List<ServiceLog> tempList = serviceLogs.stream().limit(30).toList();
 
             return ResponseEntity.ok(ResponseBody.builder()
-                    .message("Logs found. "+String.valueOf(serviceLogs.size()))
+                    .message("Logs found. " + String.valueOf(serviceLogs.size()))
                     .code(HttpStatus.OK.value())
                     .data(tempList)
                     .build());

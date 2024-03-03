@@ -68,13 +68,13 @@ public class AuthenticationEndpoint {
             authentication.setPassword(EncryptDecryptPassword.encryptPassword(authentication.getPassword()));
 
             if(authentication.getUserType().equals(UserType.CLIENT_ADMIN)) {
-                Client client = clientService.register(authentication);
+                Client client = authenticationService.registerClient(authentication);
                 return  ResponseEntity.ok(ResponseBody.ok(client)) ;
             } else if (authentication.getUserType().equals(UserType.USER)) {
 
                 return null;
             } else if (authentication.getUserType().equals(UserType.SUPER_ADMIN)) {
-               BuddyAdmin buddyAdmin =  buddyAdminService.register(authentication);
+               BuddyAdmin buddyAdmin =  authenticationService.registerBuddyAdmin(authentication);
                return  ResponseEntity.ok(ResponseBody.ok(buddyAdmin)) ;
             }
 

@@ -21,9 +21,9 @@ public interface ClientService {
 
     Client save(Client client);
 
-    Client register(Client client) throws EmailAlreadyRegistered;
+    Optional<Client> findClientByEmail(String email);
 
-    Client register(Authentication authentication) throws Exception;
+    Client register(Client client) throws EmailAlreadyRegistered;
 
     Optional<Client> findByAuthenticationId(Long aLong);
 

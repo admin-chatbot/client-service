@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface BuddyAdminRepository extends MongoRepository<BuddyAdmin, Long> {
 
     Optional<BuddyAdmin> findBuddyAdminByAuthenticationId(Long authenticationId);
+
+    Optional<BuddyAdmin> findBuddyAdminByEmail(String email);
 }

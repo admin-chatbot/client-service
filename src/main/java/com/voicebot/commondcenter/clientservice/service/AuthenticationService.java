@@ -1,6 +1,7 @@
 package com.voicebot.commondcenter.clientservice.service;
 
 import com.voicebot.commondcenter.clientservice.entity.Authentication;
+import com.voicebot.commondcenter.clientservice.entity.BuddyAdmin;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Login;
 import com.voicebot.commondcenter.clientservice.exception.InvalidUserNameAndPassword;
@@ -20,4 +21,8 @@ public interface AuthenticationService extends BaseService<Authentication> {
 
     Authentication update(Authentication authentication);
     Optional<Authentication> authenticate(String accessToken) throws TokenNotFoundException;
+    public Client registerClient(Authentication authentication) throws Exception;
+
+    BuddyAdmin registerBuddyAdmin(Authentication authentication) throws Exception;
+
 }
