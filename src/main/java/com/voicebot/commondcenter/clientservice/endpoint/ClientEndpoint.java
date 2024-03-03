@@ -75,11 +75,6 @@ public class ClientEndpoint {
     public ResponseEntity<?> getClientById(@PathVariable(name = "id") Long id) {
         try {
             Optional<Client> client = clientService.findOne(id);
-            if(client.isPresent()){
-                client.get().setPassword("");
-                client.get().setToken("");
-            }
-
             return ResponseEntity.ok(ResponseBody.builder().data(client).code(HttpStatus.OK.value()).message("Successfully get client").build());
         }catch (Exception exception){
             LOGGER.error("",exception);

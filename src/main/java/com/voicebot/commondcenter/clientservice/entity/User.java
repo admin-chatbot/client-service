@@ -58,5 +58,8 @@ public class User extends AbstractBaseEntity implements Serializable {
 
     private Status status;
 
+    @NotBlank(message = "Id should not null or empty.")
+    private Long authenticationId;
+
 
 }

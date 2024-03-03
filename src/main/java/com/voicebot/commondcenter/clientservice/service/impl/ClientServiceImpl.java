@@ -1,18 +1,25 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
+import com.voicebot.commondcenter.clientservice.entity.Authentication;
+import com.voicebot.commondcenter.clientservice.entity.BuddyAdmin;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Login;
 import com.voicebot.commondcenter.clientservice.exception.EmailAlreadyRegistered;
 import com.voicebot.commondcenter.clientservice.exception.InvalidUserNameAndPassword;
 import com.voicebot.commondcenter.clientservice.exception.TokenNotFoundException;
 import com.voicebot.commondcenter.clientservice.repository.ClientRepository;
+import com.voicebot.commondcenter.clientservice.service.ApplicationService;
+import com.voicebot.commondcenter.clientservice.service.AuthenticationService;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.utils.EncryptDecryptPassword;
 import com.voicebot.commondcenter.clientservice.utils.SecureTokenGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -23,8 +30,13 @@ import java.util.Optional;
 @Service
 public class ClientServiceImpl implements ClientService {
 
+   private static final Logger logger = LoggerFactory.getLogger(ClientServiceImpl.class);
+
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @Autowired
     SequenceGeneratorService sequenceGeneratorService;
@@ -42,7 +54,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client save(Client client) {
-        client.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
         return clientRepository.save(client);
     }
 
@@ -55,43 +66,45 @@ public class ClientServiceImpl implements ClientService {
         }
 
         client.setId(sequenceGeneratorService.generateSequence(Client.SEQUENCE_NAME));
-        client.setPassword(EncryptDecryptPassword.encryptPassword(client.getPassword()));
         client.setRegisterDate(new Date(System.currentTimeMillis()));
-        Client registeredClient = clientRepository.save(client);
-        registeredClient.setPassword("");
-        return registeredClient;
+        return clientRepository.save(client);
     }
 
     @Override
-    public Client login(Login login) throws InvalidUserNameAndPassword {
+    public Client register(Authentication authentication) throws Exception {
 
-        Optional<Client> client = clientRepository.findClientByEmail(login.getEmail());
-        if (client.isPresent()) {
-            if(EncryptDecryptPassword.checkPassword(login.getPassword(),client.get().getPassword())){
-               String token =  SecureTokenGenerator.nextToken();
-               token = token + "-"+ System.currentTimeMillis();
+        Example<Authentication> findByEmailExample = Example.of(Authentication.builder().userName(authentication.getUserName()).build());
+        Optional<Authentication> optionalAuthentication =  authenticationService.findOneByExample(findByEmailExample);
+        if(optionalAuthentication.isPresent())
+            throw new EmailAlreadyRegistered("Email is already link with another user");
 
-                Client registeredClient = client.get();
-                registeredClient.setToken(token);
-                registeredClient.setLastLogin(new Timestamp(System.currentTimeMillis()));
-                registeredClient.setExpire(new Timestamp(System.currentTimeMillis()));
-
-                registeredClient = clientRepository.save(registeredClient);
-
-                return registeredClient;
-
-            } else {
-                throw new InvalidUserNameAndPassword();
-            }
+        Optional<Client> alreadyPresent = clientRepository.findClientByEmail(authentication.getUserName());
+        if (alreadyPresent.isPresent()) {
+            throw new EmailAlreadyRegistered();
         }
-        throw new InvalidUserNameAndPassword();
+        try {
+
+            Authentication registerUser = authenticationService.register(authentication);
+
+            Client client = Client.builder().build();
+            client.setRegisterDate(new Date(System.currentTimeMillis()));
+            client.setClientName(authentication.getName());
+            client.setEmail(authentication.getUserName());
+            client.setContactNumber(authentication.getMobileNumber());
+            client.setAuthenticationId(registerUser.getId());
+
+            return register(client);
+        }catch (Exception exception) {
+            logger.error(exception.getMessage(),exception);
+            throw new Exception("Unable to register.Please try after some time.");
+        }
+
     }
 
     @Override
-    public Optional<Client> authenticate(String accessToken) throws TokenNotFoundException {
-        if(StringUtils.isBlank(accessToken))
-            throw new TokenNotFoundException();
-
-        return clientRepository.findByToken(accessToken);
+    public Optional<Client> findByAuthenticationId(Long id) {
+        return clientRepository.findClientByAuthenticationId(id);
     }
+
+
 }

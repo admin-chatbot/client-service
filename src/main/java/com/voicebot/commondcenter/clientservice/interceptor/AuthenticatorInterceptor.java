@@ -1,6 +1,9 @@
 package com.voicebot.commondcenter.clientservice.interceptor;
 
+import com.voicebot.commondcenter.clientservice.entity.Application;
+import com.voicebot.commondcenter.clientservice.entity.Authentication;
 import com.voicebot.commondcenter.clientservice.entity.Client;
+import com.voicebot.commondcenter.clientservice.service.AuthenticationService;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
 import com.voicebot.commondcenter.clientservice.service.impl.LoggingServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +27,10 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
 
 
     @Autowired
-    private ClientService clientService;
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    ClientService clientService;
 
     @Autowired
     private LoggingServiceImpl loggingService;
@@ -86,14 +92,14 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         Boolean isValid = false;// service.isValidUser(accessToken);
 
-        Optional<Client> client
-                = clientService.authenticate(accessToken);
+        Optional<Authentication> authentication
+                = authenticationService.authenticate(accessToken);
 
         /*************************************
          * CHECK SESSION TIME OUT *
          *************************************/
-        if (client.isPresent()) {
-            Date lastLogin = client.get().getLastLogin();
+        if (authentication.isPresent()) {
+            Date lastLogin = authentication.get().getLastLogin();
             long lastLoginInMills = lastLogin.getTime();
             long milliseconds = 24 * 60 * 60 * 1000;
             if (System.currentTimeMillis() > (lastLoginInMills + milliseconds)) {
@@ -102,6 +108,7 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
                 return false;
             } else {
                 isValid = true;
+                Optional<Client> client = clientService.findOne(authentication.get().getEntityId());
                 request.setAttribute("userId", client.get().getEmail());
                 request.setAttribute("username", client.get().getClientName());
                 request.setAttribute("clientId",client.get().getId());
@@ -117,7 +124,7 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
         }
         // if(logger.isDebugEnabled()) logger.debug(accessToken);
         if (logger.isDebugEnabled())
-            logger.debug("RequestURI::" + requestURI + " || Search for Person with personId ::" + client.get().getEmail());
+            logger.debug("RequestURI::" + requestURI + " || Search for Person with personId ::" + authentication.get().getUserName());
         if (logger.isDebugEnabled())
             logger.debug("---------------------------------------------");
         return true;
