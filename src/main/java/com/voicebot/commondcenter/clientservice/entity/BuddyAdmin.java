@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.Serializable;
 import java.util.Date;
 
-@Document(collection = "buddyadmin")
+@Document(collection = "buddy_admin")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder

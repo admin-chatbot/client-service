@@ -96,7 +96,7 @@ public class AuthenticationEndpoint {
                 Authentication authentication = optionalAuthentication.get();
 
                 if(authentication.getUserType().equals(UserType.CLIENT_ADMIN)) {
-                    Optional<Client> optionalClient = clientService.findByAuthenticationId(authentication.getEntityId());
+                    Optional<Client> optionalClient = clientService.findByAuthenticationId(authentication.getId());
                     if(optionalClient.isPresent()) {
                         Client client = optionalClient.get();
                         authentication.setEntityId(client.getId());

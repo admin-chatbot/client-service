@@ -113,6 +113,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 //Optional<User> optionalUser = userService.
                 return Optional.empty();
             }
+            return Optional.of(authentication);
         }
 
         return Optional.empty();

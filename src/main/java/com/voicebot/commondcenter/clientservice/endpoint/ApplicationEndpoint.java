@@ -12,6 +12,7 @@ import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
 import com.voicebot.commondcenter.clientservice.service.impl.ApplicationServiceImpl;
 import com.voicebot.commondcenter.clientservice.service.impl.ServiceServiceImpl;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
+import com.voicebot.commondcenter.clientservice.utils.UserTypeUtils;
 import io.swagger.v3.core.util.OpenAPISchema2JsonSchema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -144,20 +147,24 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> getAllApplication() {
+    public ResponseEntity<?> getAllApplication(@RequestAttribute(name = "id") Long id,
+                                               @RequestAttribute(name = "type") String type) {
         try {
-            List<Application> applications = applicationService.find();
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message( (applications!=null? String.valueOf(applications.size()) : String.valueOf(0)) )
-                    .code(HttpStatus.OK.value())
-                    .data(applications)
-                    .build());
+            List<Application> applications = new ArrayList<>();
+            if(UserTypeUtils.isSuperAdmin(type)) {
+                  applications = applicationService.find();
+            }else if(UserTypeUtils.isClientAdmin(type)) {
+                applications = applicationService.findByClint(id);
+            } else {
+                return ResponseBuilder.ok("Invalid request",applications);
+            }
+            return ResponseBuilder.ok((applications != null ? String.valueOf(applications.size()) : String.valueOf(0)),applications);
         }catch (Exception exception) {
             return ResponseBuilder.build500(exception);
         }
     }
 
-    @GetMapping("/{id}/")
+    @GetMapping("byClient/{id}/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -169,14 +176,28 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
     public ResponseEntity<?> getAllApplicationByClientId(@PathVariable(name = "id") Long clientId) {
+        return getAppByClient(clientId);
+    }
+
+    @GetMapping("byClient/")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> getAllApplicationByClientId_client_user(@RequestAttribute(name = "id") Long clientId) {
+        return getAppByClient(clientId);
+    }
+
+    private ResponseEntity<?> getAppByClient(Long clientId) {
         try {
             List<Application> applications = applicationService.findByClint(clientId);
-
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message(applications!=null? String.valueOf(applications.size()) :0+" application found.")
-                    .code(HttpStatus.OK.value())
-                    .data(applications)
-                    .build());
+            return ResponseBuilder.ok(applications != null ? String.valueOf(applications.size()) : 0 + " application found.", applications);
         }catch (Exception exception) {
             return ResponseBuilder.build500(exception);
         }
@@ -195,21 +216,37 @@ public class ApplicationEndpoint {
     })
     public ResponseEntity<?> getAllApplicationByClientIdAndStatus(@PathVariable(name = "id") Long clientId,
                                                                   @PathVariable(name = "status") Status status) {
+        return getAppByClientAndStatus(clientId, status);
+    }
+
+    @GetMapping("status/{status}")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> getAllApplicationByClientIdAndStatus_client_admin(@RequestAttribute(name = "id") Long clientId,
+                                                                  @PathVariable(name = "status") Status status) {
+        return getAppByClientAndStatus(clientId, status);
+    }
+
+    private ResponseEntity<?> getAppByClientAndStatus(Long clientId, Status status) {
         try {
 
             Application application = Application.builder().clintId(clientId).status(status).build();
             Example<Application> applicationExample = Example.of(application);
-
             List<Application> applications = applicationService.findByExample(applicationExample);
-           applications.forEach(application1 -> {
+            applications.forEach(application1 -> {
                 List<Service> services = serviceService.findAllByApplicationId(application1.getId());
                 application1.setServiceCount(services.size());
-            });
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message(applications!=null? String.valueOf(applications.size()) :0+" application found.")
-                    .code(HttpStatus.OK.value())
-                    .data(applications)
-                    .build());
+             });
+            return ResponseBuilder.ok((applications != null ? String.valueOf(applications.size()) : 0) + " application found.",applications);
+
         }catch (Exception exception) {
             return ResponseBuilder.build500(exception);
         }
@@ -226,14 +263,18 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> getAllApplication(Pageable pageable) {
+    public ResponseEntity<?> getAllApplication( @RequestAttribute(name = "id") Long id,
+                                                @RequestAttribute(name = "type") String type,
+                                                Pageable pageable) {
         try {
-            Page<Application> applications = applicationService.find(pageable);
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message("")
-                    .code(HttpStatus.OK.value())
-                    .data(applications)
-                    .build());
+            Page<Application> applications = new PageImpl<>(new ArrayList<>());
+
+            if(UserTypeUtils.isSuperAdmin(type)) {
+                applications = applicationService.find(pageable);
+            }else if (UserTypeUtils.isClientAdmin(type)){
+                applications = applicationService.findByClient(pageable,id);
+            }
+            return ResponseBuilder.ok("",applications);
         }catch (Exception exception) {
             return ResponseBuilder.build500(exception);
         }
@@ -274,12 +315,22 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseEntity.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> search(@RequestBody ApplicationSearchRequest searchRequest ) {
+    public ResponseEntity<?> search(@RequestAttribute(name = "id") Long id,
+                                    @RequestAttribute(name = "type") String type,
+                                    @RequestBody ApplicationSearchRequest searchRequest ) {
         try {
+
+            if (searchRequest==null){
+                return ResponseBuilder.invalidRequest("Search Critic should not empty.");
+            }
+
+            if (UserTypeUtils.isClientAdmin(type)){
+                searchRequest.setClientId(id);
+            }
             List<Application> applications =  applicationService.search(searchRequest);
             return ResponseBuilder.ok("",applications);
         }catch (Exception exception) {
-            exception.printStackTrace();
+            LOGGER.error(exception.getMessage(),exception);
             return ResponseBuilder.build500(exception);
         }
     }

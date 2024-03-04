@@ -64,4 +64,6 @@ public class Client extends AbstractBaseEntity implements  Serializable {
     @NotBlank(message = "Id should not null or empty.")
     private Long authenticationId;
 
+    private boolean isProfileCompleted = false;
+
 }
