@@ -14,10 +14,10 @@ public class UserTypeUtils {
     }
 
     public static boolean isClientAdmin(String userType) {
-        return StringUtils.equalsIgnoreCase(userType, UserType.SUPER_ADMIN.name());
+        return StringUtils.equalsIgnoreCase(userType, UserType.CLIENT_ADMIN.name());
     }
 
     public static boolean isClientAdmin(UserType userType) {
-        return StringUtils.equalsIgnoreCase(userType.name(), UserType.SUPER_ADMIN.name());
+        return StringUtils.equalsIgnoreCase(userType.name(), UserType.CLIENT_ADMIN.name());
     }
 }

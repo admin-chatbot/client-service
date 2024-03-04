@@ -21,6 +21,13 @@ public class ResponseBuilder {
                 .build());
     }
 
+    public static ResponseEntity<?>  invalidRequest(String message) {
+        return ResponseEntity.badRequest().body( ResponseBody.builder()
+                .code(HttpStatus.OK.value())
+                .message("Invalid Request. "+message)
+                .build());
+    }
+
     public static <I> ResponseEntity<?> ok(String message, I i) {
         return ResponseEntity.ok(ResponseBody.builder()
                 .message(message)

@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "serviceparameters")
+@Document(collection = "service_parameters")
 @Data
 @Builder
 @AllArgsConstructor

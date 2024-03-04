@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.io.Serializable;
 import java.util.Date;
 
-@Document(collection = "botrequestlog")
+@Document(collection = "bot_request_log")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
