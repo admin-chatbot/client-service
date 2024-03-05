@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.voicebot.commondcenter</groupId>
 	<artifactId>client-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<name>client-service</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -107,6 +107,19 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<!--plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.5.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin-->
 		</plugins>
 	</build>
 

@@ -69,8 +69,16 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
-    public ResponseEntity<?> onBoard(@RequestBody @Valid Application application){
+    public ResponseEntity<?> onBoard(
+            @RequestAttribute(name = "id") Long id,
+            @RequestAttribute(name = "type") String type,
+            @RequestBody @Valid Application application ){
         try {
+
+            if(UserTypeUtils.isClientAdmin(type)) {
+                application.setClintId(id);
+            }
+
             Optional<Client> client = clientService.findOne(application.getClintId());
 
             if(client.isEmpty()) {
