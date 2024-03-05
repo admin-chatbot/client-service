@@ -1,5 +1,11 @@
-FROM amazoncorretto:17
-EXPOSE 80
+FROM maven:3.8.6-amazoncorretto-17 AS build
+CMD mkdir /app
+COPY pom.xml .
+COPY src ./src
 RUN mvn clean package -DskipTests
-ADD target/client-service-0.0.2.jar client-service-0.0.2.jar
+
+FROM amazoncorretto:17
+WORKDIR /app
+ADD target/client-service-0.0.2.jar .
+EXPOSE 80
 ENTRYPOINT ["java","-jar","client-service-0.0.2.jar"]
