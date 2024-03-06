@@ -31,5 +31,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/git-client-service:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/git-client-service:${{ steps.increment-git-tag.outputs.git-tag }}
 
