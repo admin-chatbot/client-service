@@ -79,13 +79,19 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
             return true;
         }*/
 
+        if(request.getRequestURI().contains("/api/v1/devtool")) {
+            return true;
+        }
+
+        if(request.getRequestURI().contains("/api/v1/auth")) {
+            return true;
+        }
+
         if(!request.getRequestURI().contains("/api/v1")) {
             return true;
         }
 
-        if(request.getRequestURI().contains("/api/v1/devtool")) {
-            return true;
-        }
+
 
 
         /*************************************
