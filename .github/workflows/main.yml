@@ -53,7 +53,7 @@ jobs:
         id: render-web-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          task-definition: .aws/task-definition.json
           container-name: client-service
           image: registry.hub.docker.com/jitendrasagoriya/git-client-service:${{ steps.increment-git-tag.outputs.git-tag }}
           environment-variables: "LOG_LEVEL=info"
