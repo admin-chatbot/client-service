@@ -17,6 +17,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Automatic Tagging of Releases
+        id: increment-git-tag
+        run: |
+          bash ./build/git_update.sh -v major
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
