@@ -20,7 +20,7 @@ jobs:
       - name: Automatic Tagging of Releases
         id: increment-git-tag
         run: |
-          bash ./build/git_update.sh -v major
+          bash ./build/git_update.sh -v patch
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -31,5 +31,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/git-client-service:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/git-client-service:${{ steps.increment-git-tag.outputs.git-tag }}
 
