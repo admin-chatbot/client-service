@@ -10,11 +10,11 @@ env:
   ECS_SERVICE: ecs-client-service
   ECS_CLUSTER: DevClientServiceCluster
   ECS_TASK_DEFINITION: .aws/task-definition.json
-  CONTAINER_NAME: container-ecs-client-service
+  CONTAINER_NAME: git-action-container-client-service
 
 jobs:
   build-and-push:
-    name: Build and Push to ECR
+    name: Build and Push to Docker Hub then deploy ECS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
