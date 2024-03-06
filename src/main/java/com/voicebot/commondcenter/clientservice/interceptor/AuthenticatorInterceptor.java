@@ -54,10 +54,14 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
 
         System.out.println(request.getRequestURI());
 
-        if (request.getRequestURI().contains("swagger")) {
+       /* if (request.getRequestURI().contains("swagger")) {
             return true;
         }
         if (request.getRequestURI().contains("/api-docs")) {
+            return true;
+        }
+
+        if (request.getRequestURI().contains("/actuator")) {
             return true;
         }
 
@@ -73,7 +77,16 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
 
         if (request.getRequestURI().contains("/error")) {
             return true;
+        }*/
+
+        if(!request.getRequestURI().contains("/api/v1")) {
+            return true;
         }
+
+        if(request.getRequestURI().contains("/api/v1/devtool")) {
+            return true;
+        }
+
 
         /*************************************
          * CHECK HEADER
