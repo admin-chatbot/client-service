@@ -36,7 +36,7 @@ import java.util.Optional;
 import static com.voicebot.commondcenter.clientservice.utils.ResponseBuilder.build500;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping(path = "/api/v1/botrequestlog/")
 @Tag(name = "BotRequestLog", description = "Bot Request Log APIs")
 public class BotRequestLogEndpoint {

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping(path = "/api/v1/user/")
 @Tag(name = "User", description = "User management APIs")
 public class UserEndpoint {
