@@ -91,6 +91,11 @@ public class ApplicationServiceImpl implements ApplicationService, BaseService<A
     }
 
     @Override
+    public Optional<Application> findByClientAndId(Long clientId, Long id) {
+        return applicationRepository.findApplicationByClintIdAndId(clientId,id);
+    }
+
+    @Override
     public Page<Application> findByClient(Pageable pageable, Long id) {
         return applicationRepository.findApplicationsByClintId(id,pageable);
     }

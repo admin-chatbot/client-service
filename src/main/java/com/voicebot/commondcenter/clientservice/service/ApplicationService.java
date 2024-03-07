@@ -21,6 +21,9 @@ public interface ApplicationService {
     Page<Application> find(Pageable pageable);
     Optional<Application> findOne(Long id);
     List<Application> findByClint(Long id);
+
+    Optional<Application> findByClientAndId(Long clientId, Long id);
+
     Page<Application> findByClient(Pageable pageable, Long id);
     Optional<Application> findApplicationByName(String name);
     Optional<Application> findApplicationByClientAndName(Long clientId,String name);
