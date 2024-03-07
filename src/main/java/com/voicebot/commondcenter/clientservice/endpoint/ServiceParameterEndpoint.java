@@ -28,7 +28,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(path = "/api/v1/service/parameter/" )
 @Tag(name = "ServiceParameter", description = "Service Parameter Management APIs")
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*" )
 public class ServiceParameterEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceParameterEndpoint.class);

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Random;
 
 @RestController
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*" )
 @RequestMapping(path = "/api/v1/devtool/")
 @Tag(name = "DevTool", description = "DevTool")
 public class ApplicationDevToolEndpoint {

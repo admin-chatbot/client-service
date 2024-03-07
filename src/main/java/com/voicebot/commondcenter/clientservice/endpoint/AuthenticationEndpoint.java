@@ -34,7 +34,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/v1/auth/",produces = MediaType.APPLICATION_JSON_VALUE)
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*" )
 @Tag(name = "Authentication", description = "Authentication APIs")
 public class AuthenticationEndpoint {
 

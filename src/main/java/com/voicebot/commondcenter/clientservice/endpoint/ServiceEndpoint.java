@@ -53,7 +53,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(path = "/api/v1/service/" )
 @Tag(name = "Service", description = "Service Management APIs")
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*" )
 public class ServiceEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceEndpoint.class);
