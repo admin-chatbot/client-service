@@ -110,7 +110,9 @@ public class ApplicationEndpoint {
             ),
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
-    public ResponseEntity<?> edit(@RequestBody @Valid Application application){
+    public ResponseEntity<?> edit(@RequestBody @Valid Application application,
+                                  @RequestAttribute(name = "id") Long id,
+                                  @RequestAttribute(name = "type") String type){
 
         LOGGER.info("edit, Application : {}",application);
         try {
@@ -121,6 +123,10 @@ public class ApplicationEndpoint {
 
             if(application.getId() == null ){
                 return ResponseBuilder.build400("Application Id should not null.");
+            }
+
+            if(UserTypeUtils.isClientAdmin(type)) {
+                application.setClintId(id);
             }
 
             Optional<Application> applicationFromDB = applicationService.findOne(application.getId());
@@ -185,6 +191,33 @@ public class ApplicationEndpoint {
     })
     public ResponseEntity<?> getAllApplicationByClientId(@PathVariable(name = "id") Long clientId) {
         return getAppByClient(clientId);
+    }
+
+    @GetMapping("byId/{id}/")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Application.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
+    })
+    public ResponseEntity<?> getApplicationById(@PathVariable(name = "id") Long appId,
+                                                @RequestAttribute(name = "id") Long id,
+                                                @RequestAttribute(name = "type") String type) {
+        try {
+           Optional<Application> application;
+            if (UserTypeUtils.isSuperAdmin(type)) {
+                application = applicationService.findOne(appId);
+            } else {
+                application = applicationService.findByClientAndId(id, appId);
+            }
+            return ResponseBuilder.ok("Application found.", application);
+        }catch (Exception exception) {
+            return ResponseBuilder.build500(exception);
+        }
     }
 
     @GetMapping("byClient/")
