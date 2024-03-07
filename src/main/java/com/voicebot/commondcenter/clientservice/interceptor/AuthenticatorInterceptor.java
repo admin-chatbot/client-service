@@ -65,9 +65,7 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
-            return true;
-        }
+
         if (request.getMethod().equalsIgnoreCase("POST") && request.getRequestURI().contains("/register")) {
             return true;
         }
@@ -78,6 +76,13 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
         if (request.getRequestURI().contains("/error")) {
             return true;
         }*/
+
+        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            return true;
+        }
+        if (request.getRequestURI().contains("/error")) {
+            return true;
+        }
 
         if(request.getRequestURI().contains("/api/v1/devtool")) {
             return true;

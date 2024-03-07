@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping(path = "/api/v1/data/load/")
 @Tag(name = "Test Load", description = "Data Load APIs")
 public class DataLoadEndpoint {

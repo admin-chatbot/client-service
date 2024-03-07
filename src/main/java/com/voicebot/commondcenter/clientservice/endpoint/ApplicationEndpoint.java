@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping(path = "/api/v1/application/")
 @Tag(name = "Application", description = "Application management APIs")
 public class ApplicationEndpoint {

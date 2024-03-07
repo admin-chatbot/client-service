@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/service/")
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
 @Tag(name = "AutoDiscovery", description = "Auto Discovery Service APIs")
 public class  AutoDiscoveryEndpoint {
 
