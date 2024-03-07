@@ -33,7 +33,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api/v1/dashboard/" )
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*" )
 @Tag(name = "Dashboard", description = "Dashboard Management APIs")
 public class DashboardEndpoint {
 
