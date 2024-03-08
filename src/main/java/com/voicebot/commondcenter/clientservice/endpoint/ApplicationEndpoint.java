@@ -97,6 +97,48 @@ public class ApplicationEndpoint {
         }
     }
 
+
+    @PutMapping(path = "deleteById/{appId}" ,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = Application.class),
+                            mediaType = "application/json") }
+            ),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
+    public ResponseEntity<?> deleteApplication(@PathVariable(name = "appId") Long id,
+                                  @RequestAttribute(name = "id") Long clientId,
+                                  @RequestAttribute(name = "type") String type){
+
+        try {
+            Optional<Application> application;
+            if (UserTypeUtils.isSuperAdmin(type)) {
+                application = applicationService.findOne(id);
+            } else {
+                application = applicationService.findByClientAndId(clientId, id);
+            }
+
+            if(application.isPresent()) {
+                application.get().setStatus(Status.INACTIVE);
+                applicationService.repository().save(application.get());
+            }
+
+            return ResponseBuilder.ok("Application found.", application);
+        }catch (Exception exception) {
+            return ResponseBuilder.build500(exception);
+        }
+
+    }
+
+
+
+
+
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
@@ -193,7 +235,7 @@ public class ApplicationEndpoint {
         return getAppByClient(clientId);
     }
 
-    @GetMapping("byId/{id}/")
+    @GetMapping("byId/{appid}/")
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -204,7 +246,7 @@ public class ApplicationEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) }) ,
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = String.class),mediaType = MediaType.TEXT_PLAIN_VALUE) })
     })
-    public ResponseEntity<?> getApplicationById(@PathVariable(name = "id") Long appId,
+    public ResponseEntity<?> getApplicationById(@PathVariable(name = "appid") Long appId,
                                                 @RequestAttribute(name = "id") Long id,
                                                 @RequestAttribute(name = "type") String type) {
         try {
