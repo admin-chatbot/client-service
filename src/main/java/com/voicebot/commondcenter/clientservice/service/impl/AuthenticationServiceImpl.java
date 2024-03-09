@@ -77,7 +77,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public Authentication register(Authentication authentication) {
+    public Authentication register(Authentication authentication) throws EmailAlreadyRegistered {
+
+        Optional<Authentication> optionalAuthentication = authenticationRepository.findAuthenticationByUserName(authentication.getUserName());
+        if(optionalAuthentication.isPresent()) {
+            throw  new EmailAlreadyRegistered();
+        }
         authentication.setCreatedTimestamp(new Date(System.currentTimeMillis()));
         authentication.setModifiedTimestamp(new Date(System.currentTimeMillis()));
         authentication.setId(sequenceGeneratorService.generateSequence(Authentication.SEQUENCE_NAME));
