@@ -66,7 +66,12 @@ public class Service extends AbstractBaseEntity implements  Serializable {
 
     private String responseSchema;
 
+    private String requestSchema;
+
     private Long clintId;
+
+    @Transient
+    private ServiceIntends serviceIntends;
 
     @Transient
     private int parameterCount;
