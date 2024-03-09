@@ -188,6 +188,39 @@ public class ServiceEndpoint {
         return getServiceByClient(id);
     }
 
+
+    @GetMapping()
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
+    })
+    public ResponseEntity<?> getServices(@RequestAttribute(value = "id") Long id,
+                                         @RequestAttribute(name = "type") String type) {
+
+        try {
+            List<Service> services = null;
+            if (UserTypeUtils.isSuperAdmin(type)) {
+                services = serviceService.find();
+            } else if (UserTypeUtils.isClientAdmin(type)) {
+                services = serviceService.findAllByClientId(id);
+            }
+            return ResponseBuilder.ok( (services!=null?services.size():0) + " Services Found.", services);
+        }catch (Exception exception) {
+            LOGGER.error("", exception);
+            return ResponseBuilder.build500(exception) ;
+        }
+
+
+    }
+
+
     private ResponseEntity<?> getServiceByClient(Long clientId) {
         try {
             LOGGER.info("getAllServiceByClientId");
