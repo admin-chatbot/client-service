@@ -1,6 +1,6 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
-import com.voicebot.commondcenter.clientservice.entity.ServiceIntends;
+import com.voicebot.commondcenter.clientservice.entity.ServiceIntend;
 import com.voicebot.commondcenter.clientservice.exception.ServiceNotFoundException;
 import com.voicebot.commondcenter.clientservice.repository.ServiceIntendRepository;
 import com.voicebot.commondcenter.clientservice.service.ServiceIntendService;
@@ -20,63 +20,71 @@ public class ServiceIntendServiceImpl implements ServiceIntendService {
     private ServiceIntendRepository  serviceIntendRepository;
 
     @Override
-    public List<ServiceIntends> findByExample(Example<ServiceIntends> serviceIntendsExample) {
-        return null;
+    public List<ServiceIntend> findByExample(Example<ServiceIntend> serviceIntendsExample) {
+        return serviceIntendRepository.findAll(serviceIntendsExample);
     }
 
     @Override
-    public Page<ServiceIntends> findByExample(Example<ServiceIntends> serviceIntendsExample, Pageable pageable) {
-        return null;
+    public Page<ServiceIntend> findByExample(Example<ServiceIntend> serviceIntendsExample, Pageable pageable) {
+        return serviceIntendRepository.findAll(serviceIntendsExample,pageable);
     }
 
     @Override
-    public Optional<ServiceIntends> findOneByExample(Example<ServiceIntends> serviceIntendsExample) {
-        return Optional.empty();
+    public Optional<ServiceIntend> findOneByExample(Example<ServiceIntend> serviceIntendsExample) {
+        return serviceIntendRepository.findOne(serviceIntendsExample);
     }
 
     @Override
-    public List<ServiceIntends> search(ServiceIntends serviceIntends) {
-        return null;
+    public List<ServiceIntend> search(ServiceIntend serviceIntend) {
+        Example<ServiceIntend> intendsExample  = Example.of(serviceIntend);
+        return findByExample(intendsExample);
     }
 
     @Override
-    public Page<ServiceIntends> search(ServiceIntends serviceIntends, Pageable pageable) {
-        return null;
+    public Page<ServiceIntend> search(ServiceIntend serviceIntend, Pageable pageable) {
+        Example<ServiceIntend> intendsExample  = Example.of(serviceIntend);
+        return findByExample(intendsExample,pageable);
     }
 
     @Override
-    public ServiceIntends save(ServiceIntends serviceIntend) throws ServiceNotFoundException {
+    public ServiceIntend save(ServiceIntend serviceIntend) throws ServiceNotFoundException {
         return serviceIntendRepository.save(serviceIntend);
     }
 
     @Override
-    public List<ServiceIntends> findAll() {
+    public List<ServiceIntend> findAll() {
         return serviceIntendRepository.findAll();
     }
 
     @Override
-    public List<ServiceIntends> findByName(String name) {
+    public List<ServiceIntend> findByName(String name) {
         return null;
     }
 
     @Override
-    public List<ServiceIntends> findByServiceId(Long serviceId) {
+    public List<ServiceIntend> findByServiceId(Long serviceId) {
         return serviceIntendRepository.findByServiceId(serviceId);
     }
 
     @Override
-    public List<ServiceIntends> findByApplicationId(Long applicationId) {
+    public Optional<ServiceIntend> findByIntend(String intend) {
+        Example<ServiceIntend> serviceIntendsExample = Example.of(ServiceIntend.builder().intend(intend).build());
+        return findOneByExample(serviceIntendsExample);
+    }
+
+    @Override
+    public List<ServiceIntend> findByApplicationId(Long applicationId) {
         return null;
     }
 
     @Override
-    public ServiceIntends findById(Long id) {
-        return null;
+    public ServiceIntend findById(Long id) throws ServiceNotFoundException {
+        return serviceIntendRepository.findById(id).orElseThrow(() -> new ServiceNotFoundException("Service not found"));
     }
 
     @Override
-    public ServiceIntends update(ServiceIntends serviceIntend) {
-        return null;
+    public ServiceIntend update(ServiceIntend serviceIntend) {
+        return serviceIntendRepository.save(serviceIntend);
     }
 
     @Override
@@ -85,7 +93,7 @@ public class ServiceIntendServiceImpl implements ServiceIntendService {
     }
 
     @Override
-    public void delete(ServiceIntends serviceIntend) {
+    public void delete(ServiceIntend serviceIntend) {
 
     }
 
@@ -96,21 +104,14 @@ public class ServiceIntendServiceImpl implements ServiceIntendService {
 
     @Override
     public boolean existsById(Long id) {
-        return false;
+        return serviceIntendRepository.existsById(id);
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return false;
+    public boolean existsByIntend(String name) {
+        Example<ServiceIntend> serviceIntendsExample = Example.of(ServiceIntend.builder().intend(name).build());
+        return findOneByExample(serviceIntendsExample).isPresent();
     }
 
-    @Override
-    public boolean existsByApplicationId(Long applicationId) {
-        return false;
-    }
 
-    @Override
-    public boolean existsByApplicationIdAndName(Long applicationId, String name) {
-        return false;
-    }
 }
