@@ -65,9 +65,18 @@ public class UserEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
-    public ResponseEntity<?> save(@RequestBody @Valid User user) {
+    public ResponseEntity<?> save(@RequestBody @Valid User user,
+                                  @RequestAttribute(name = "id") Long id,
+                                  @RequestAttribute(name = "type") String type) {
         try {
             LOGGER.info("user {} ",user);
+
+            Long clientId = 0l;
+            if(UserTypeUtils.isClientAdmin(type)) {
+                clientId = id;
+            } else if (UserTypeUtils.isSuperAdmin(type)) {
+                clientId = user.getClientId();
+            }
 
             if (user==null) {
                 return ResponseEntity.badRequest().body( ResponseBody.builder()
@@ -111,6 +120,7 @@ public class UserEndpoint {
 
             if(responseAuthentication!=null && responseAuthentication.getId()!=null) {
                 user.setAuthenticationId(responseAuthentication.getId());
+                user.setClientId(clientId);
                 User u =  userService.save(user);
 
                 return ResponseEntity.ok(ResponseBody.builder()
