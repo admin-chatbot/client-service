@@ -1,41 +1,41 @@
 package com.voicebot.commondcenter.clientservice.service;
 
-import com.voicebot.commondcenter.clientservice.entity.Authentication;
-import com.voicebot.commondcenter.clientservice.entity.ServiceIntends;
+import com.voicebot.commondcenter.clientservice.entity.ServiceIntend;
 import com.voicebot.commondcenter.clientservice.exception.ServiceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
-public interface ServiceIntendService extends BaseService<ServiceIntends>{
-    ServiceIntends save(ServiceIntends serviceIntend) throws ServiceNotFoundException;
-    List<ServiceIntends> findAll();
-    List<ServiceIntends> findByName(String name);
+public interface ServiceIntendService extends BaseService<ServiceIntend>{
+    ServiceIntend save(ServiceIntend serviceIntend) throws ServiceNotFoundException;
+    List<ServiceIntend> findAll();
+    List<ServiceIntend> findByName(String name);
 
-    List<ServiceIntends> findByServiceId(Long serviceId);
+    List<ServiceIntend> findByServiceId(Long serviceId);
 
-    List<ServiceIntends> findByApplicationId(Long applicationId);
+    Optional<ServiceIntend> findByIntend(String intend);
 
-    ServiceIntends findById(Long id);
+    List<ServiceIntend> findByApplicationId(Long applicationId);
 
-    ServiceIntends update(ServiceIntends serviceIntend);
+    ServiceIntend findById(Long id) throws ServiceNotFoundException;
+
+    ServiceIntend update(ServiceIntend serviceIntend);
 
     void delete(Long id);
 
-    void delete(ServiceIntends serviceIntend);
+    void delete(ServiceIntend serviceIntend);
 
     void deleteAll();
 
     boolean existsById(Long id);
 
 
-    boolean existsByName(String name);
+    boolean existsByIntend(String name);
 
-    boolean existsByApplicationId(Long applicationId);
 
-    boolean existsByApplicationIdAndName(Long applicationId, String name);
 
 
 

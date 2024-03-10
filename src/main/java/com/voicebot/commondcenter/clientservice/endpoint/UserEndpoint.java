@@ -5,10 +5,14 @@ import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
 import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.dto.UserSearchRequest;
 import com.voicebot.commondcenter.clientservice.entity.Application;
+import com.voicebot.commondcenter.clientservice.entity.Authentication;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.entity.User;
 import com.voicebot.commondcenter.clientservice.enums.Status;
+import com.voicebot.commondcenter.clientservice.enums.UserType;
+import com.voicebot.commondcenter.clientservice.service.AuthenticationService;
 import com.voicebot.commondcenter.clientservice.service.UserService;
+import com.voicebot.commondcenter.clientservice.utils.PasswordUtils;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import com.voicebot.commondcenter.clientservice.utils.UserTypeUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +49,9 @@ public class UserEndpoint {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(parameters = {
@@ -93,12 +100,32 @@ public class UserEndpoint {
                         .build());
             }
 
-            User u =  userService.save(user);
-            return ResponseEntity.ok(ResponseBody.builder()
-                    .message("Successfully registered with us.")
-                    .code(HttpStatus.OK.value())
-                    .data(u)
-                    .build());
+            Authentication authentication = new Authentication();
+            authentication.setUserName(user.getEmail());
+            authentication.setUserName(user.getEmail());
+            authentication.setPassword(PasswordUtils.generate());
+            authentication.setUserType(UserType.USER);
+            authentication.setMobileNumber(user.getMobileNumber());
+
+            Authentication responseAuthentication = authenticationService.register(authentication);
+
+            if(responseAuthentication!=null && responseAuthentication.getId()!=null) {
+                user.setAuthenticationId(responseAuthentication.getId());
+                User u =  userService.save(user);
+
+                return ResponseEntity.ok(ResponseBody.builder()
+                        .message("Successfully registered with us.")
+                        .code(HttpStatus.OK.value())
+                        .data(u)
+                        .build());
+            }else {
+                return ResponseEntity.badRequest().body( ResponseBody.builder()
+                        .message("Failed to register with us.")
+                        .code(HttpStatus.BAD_REQUEST.value())
+                        .build());
+            }
+
+
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()

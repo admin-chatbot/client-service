@@ -341,23 +341,22 @@ public class ServiceEndpoint {
             @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
             @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
     })
-    public ResponseEntity<?> save(@RequestBody @Valid Service service,
+    public ResponseEntity<?> save(@RequestBody   Service service,
                                   @RequestAttribute(value = "id") Long clientId,
                                   @RequestAttribute(name = "type") String type) {
         try {
             LOGGER.info("Client {} ",service);
 
-            if(service.getClientId().equals(clientId)
-                    || UserTypeUtils.isSuperAdmin(type)) {
-                Service c = serviceService.save(service);
-                return ResponseEntity.ok(ResponseBody.builder()
-                        .message("")
-                        .code(HttpStatus.OK.value())
-                        .data(c)
-                        .build());
-            } else {
-                return ResponseEntity.ok(ResponseBody.badRequest("UnAuthorize Request."));
+            if( UserTypeUtils.isClientAdmin(type) ){
+                service.setClientId(clientId);
             }
+            Service c = serviceService.save(service);
+            return ResponseEntity.ok(ResponseBody.builder()
+                    .message("Service is successfully on boarded.")
+                    .code(HttpStatus.OK.value())
+                    .data(c)
+                    .build());
+
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()
