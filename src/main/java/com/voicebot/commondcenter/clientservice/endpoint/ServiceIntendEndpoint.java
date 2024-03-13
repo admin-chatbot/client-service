@@ -5,6 +5,7 @@ import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.entity.ServiceIntend;
 import com.voicebot.commondcenter.clientservice.service.ServiceIntendService;
+import com.voicebot.commondcenter.clientservice.service.ServiceService;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class ServiceIntendEndpoint {
     @Autowired
     private ServiceIntendService  serviceIntendService;
 
+    @Autowired
+    private ServiceService  serviceService;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
@@ -54,7 +59,7 @@ public class ServiceIntendEndpoint {
             } else {
                 intend = serviceIntend;
             }
-            serviceIntend =  serviceIntendService.save(intend);
+            serviceIntend =  serviceIntendService.onBoard(intend);
             return ResponseBuilder.ok("Service Intend is successfully on boarded.",serviceIntend);
 
         } catch (Exception exception) {
@@ -63,6 +68,38 @@ public class ServiceIntendEndpoint {
         }
 
     }
+
+
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    public ResponseEntity<?> edit(@NotNull @Valid @RequestBody ServiceIntend serviceIntend) {
+        try {
+            LOGGER.info("START SAVE ServiceIntend {}",serviceIntend);
+            if(serviceIntend == null) {
+                return ResponseBuilder.build400("Invalid Request. Please try some time later");
+            }
+            if(StringUtils.isBlank(serviceIntend.getIntend())) {
+                return ResponseBuilder.build400("Intend is required");
+            }
+            Optional<Service> service = serviceService.fetchOne(serviceIntend.getServiceId());
+           if(service.isEmpty()){
+               return ResponseBuilder.build400("Service not found");
+           }
+
+            serviceIntend =  serviceIntendService.edit(serviceIntend);
+            return ResponseBuilder.ok("Service Intend is successfully on boarded.",serviceIntend);
+        } catch (Exception exception) {
+            LOGGER.error("", exception);
+            return ResponseBuilder.build500(exception) ;
+        }
+
+    }
+
 
     @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(parameters = {

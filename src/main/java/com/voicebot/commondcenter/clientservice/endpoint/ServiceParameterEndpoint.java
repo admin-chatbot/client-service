@@ -158,12 +158,6 @@ public class ServiceParameterEndpoint {
                     , name = "X-AUTH-LOG-HEADER"
                     , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
     })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
-    })
     public ResponseEntity<?> edit(@RequestBody @Valid ServiceParameter serviceParameter) {
         try {
             LOGGER.info("serviceParameter {} ",serviceParameter);
@@ -192,7 +186,7 @@ public class ServiceParameterEndpoint {
             }
 
 
-            ServiceParameter c =  serviceParameterService.save(serviceParameter);
+            ServiceParameter c =  serviceParameterService.edit(serviceParameter);
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("Inserted successfully. ServiceParameter {}",c);
 
