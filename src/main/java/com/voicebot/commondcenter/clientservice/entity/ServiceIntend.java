@@ -3,6 +3,8 @@ package com.voicebot.commondcenter.clientservice.entity;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.Serializable;
 import java.util.List;
@@ -15,6 +17,12 @@ import java.util.List;
 @ToString(callSuper = true)
 @Builder
 public class ServiceIntend extends AbstractBaseEntity implements Serializable {
+
+    @Transient
+    public static final String SEQUENCE_NAME = "intent_sequence";
+
+    @Id
+    private Long id;
 
     @NotNull(message = "Service Id should not null or empty.")
     private Long serviceId;
