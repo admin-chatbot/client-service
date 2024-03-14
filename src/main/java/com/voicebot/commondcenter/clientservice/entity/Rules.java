@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
-@Document(collection = "rules")
+@Document(collection = "rule")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
