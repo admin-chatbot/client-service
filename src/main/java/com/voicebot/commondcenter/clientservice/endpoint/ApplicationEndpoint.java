@@ -1,19 +1,16 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
+import com.voicebot.commondcenter.clientservice.dto.ApplicationIDName;
 import com.voicebot.commondcenter.clientservice.dto.ApplicationSearchRequest;
-import com.voicebot.commondcenter.clientservice.dto.ResponseBody;
 import com.voicebot.commondcenter.clientservice.entity.Application;
 import com.voicebot.commondcenter.clientservice.entity.Client;
 import com.voicebot.commondcenter.clientservice.entity.Service;
 import com.voicebot.commondcenter.clientservice.enums.Status;
-import com.voicebot.commondcenter.clientservice.service.ApplicationService;
 import com.voicebot.commondcenter.clientservice.service.ClientService;
-import com.voicebot.commondcenter.clientservice.service.ServiceParameterService;
 import com.voicebot.commondcenter.clientservice.service.impl.ApplicationServiceImpl;
 import com.voicebot.commondcenter.clientservice.service.impl.ServiceServiceImpl;
 import com.voicebot.commondcenter.clientservice.utils.ResponseBuilder;
 import com.voicebot.commondcenter.clientservice.utils.UserTypeUtils;
-import io.swagger.v3.core.util.OpenAPISchema2JsonSchema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -22,8 +19,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.models.OpenAPI;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +29,11 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*" )
@@ -191,6 +184,44 @@ public class ApplicationEndpoint {
             return ResponseBuilder.build500(exception);
         }
     }
+
+    @GetMapping(path = "getName")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    public ResponseEntity<?> getApplicationNames(@RequestParam(name = "ids") String ids,@RequestAttribute(name = "id") Long id) {
+        try{
+            List<Application> applications ;
+            LOGGER.info("ids : {}",ids);
+            if(!StringUtils.isBlank(ids)) {
+                String[] applicationIds =  StringUtils.split(ids,",");
+                Long[] a = new Long[applicationIds.length];
+                for(int i = 0; i < applicationIds.length; i++) {
+                    try {
+                        a[i] = Long.valueOf(applicationIds[i]);
+                    } catch (NumberFormatException ignored){
+                        LOGGER.error("Invalid application id : {}", applicationIds[i]);
+                    }
+                }
+                applications = applicationService.repository().findAllById(Arrays.asList(a));
+            } else {
+                applications = applicationService.findByClint(id);
+            }
+
+           List<ApplicationIDName> applicationIdNames = new ArrayList<>();
+           for(Application application : applications) {
+               applicationIdNames.add(ApplicationIDName.builder().id(application.getId()).Name(application.getName()).build());
+           }
+           return ResponseBuilder.ok("Application found.", applicationIdNames);
+
+        }catch (Exception exception) {
+             LOGGER.error(exception.getMessage(), exception);
+            return ResponseBuilder.build500(exception);
+        }
+    }
+
 
     @GetMapping
     @Operation(parameters = {

@@ -1,8 +1,10 @@
 package com.voicebot.commondcenter.clientservice.service.impl;
 
 import com.voicebot.commondcenter.clientservice.entity.ServiceIntend;
+import com.voicebot.commondcenter.clientservice.enums.Status;
 import com.voicebot.commondcenter.clientservice.exception.ServiceNotFoundException;
 import com.voicebot.commondcenter.clientservice.repository.ServiceIntendRepository;
+import com.voicebot.commondcenter.clientservice.service.SequenceGeneratorService;
 import com.voicebot.commondcenter.clientservice.service.ServiceIntendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +21,9 @@ public class ServiceIntendServiceImpl implements ServiceIntendService {
 
     @Autowired
     private ServiceIntendRepository  serviceIntendRepository;
+
+    @Autowired
+    SequenceGeneratorService sequenceGeneratorService;
 
     @Override
     public List<ServiceIntend> findByExample(Example<ServiceIntend> serviceIntendsExample) {
@@ -50,6 +56,20 @@ public class ServiceIntendServiceImpl implements ServiceIntendService {
     public ServiceIntend save(ServiceIntend serviceIntend) throws ServiceNotFoundException {
         return serviceIntendRepository.save(serviceIntend);
     }
+
+    @Override
+    public ServiceIntend onBoard(ServiceIntend serviceIntend) throws ServiceNotFoundException {
+        serviceIntend.setId(sequenceGeneratorService.generateSequence(com.voicebot.commondcenter.clientservice.entity.Service.SEQUENCE_NAME));
+        serviceIntend.setCreatedTimestamp(new Date(System.currentTimeMillis()));
+        serviceIntend.setModifiedTimestamp(new Date(System.currentTimeMillis()));
+        return save(serviceIntend);
+    }
+
+    @Override
+    public ServiceIntend edit(ServiceIntend serviceIntend) throws ServiceNotFoundException {
+        return save(serviceIntend);
+    }
+
 
     @Override
     public List<ServiceIntend> findAll() {

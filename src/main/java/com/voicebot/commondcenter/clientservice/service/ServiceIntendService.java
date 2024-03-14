@@ -11,6 +11,11 @@ import java.util.Optional;
 @Service
 public interface ServiceIntendService extends BaseService<ServiceIntend>{
     ServiceIntend save(ServiceIntend serviceIntend) throws ServiceNotFoundException;
+
+    ServiceIntend onBoard(ServiceIntend serviceIntend) throws ServiceNotFoundException;
+
+    ServiceIntend edit(ServiceIntend serviceIntend) throws ServiceNotFoundException;
+
     List<ServiceIntend> findAll();
     List<ServiceIntend> findByName(String name);
 
