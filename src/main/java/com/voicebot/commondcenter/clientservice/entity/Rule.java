@@ -1,10 +1,8 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
-import com.voicebot.commondcenter.clientservice.entity.AbstractBaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -15,7 +13,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Rules extends AbstractBaseEntity implements Serializable {
+public class Rule extends AbstractBaseEntity implements Serializable {
 
     @Id
     private Long id;
