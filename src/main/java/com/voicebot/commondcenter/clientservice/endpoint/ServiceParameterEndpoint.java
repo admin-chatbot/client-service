@@ -32,10 +32,8 @@ import java.util.Optional;
 public class ServiceParameterEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceParameterEndpoint.class);
-
     @Autowired
     private ServiceParameterService serviceParameterService;
-
     @Autowired
     private ServiceService serviceService;
 
@@ -175,22 +173,19 @@ public class ServiceParameterEndpoint {
                         .code(HttpStatus.PARTIAL_CONTENT.value())
                         .build());
             }
-
             Optional<Service> service = serviceService.fetchOne(serviceParameter.getServiceId());
-
             if(service.isEmpty()) {
                 return ResponseEntity.internalServerError().body( ResponseBody.builder()
                         .message("Invalid Service.")
                         .code(HttpStatus.BAD_REQUEST.value())
                         .build());
             }
-
-
             ServiceParameter c =  serviceParameterService.edit(serviceParameter);
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("Inserted successfully. ServiceParameter {}",c);
 
             return ResponseEntity.ok(ResponseBody.builder().data(c).message("Parameter successfully added.").code(HttpStatus.OK.value()).build());
+
         }catch (Exception exception) {
             LOGGER.error(exception.getMessage(),exception);
             return ResponseEntity.internalServerError().body( ResponseBody.builder()

@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -195,15 +196,9 @@ public class ServiceEndpoint {
                     , name = "X-AUTH-LOG-HEADER"
                     , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
     })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = Service.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema(implementation = ResponseBody.class), mediaType = "application/json") })
-    })
+
     public ResponseEntity<?> getServices(@RequestAttribute(value = "id") Long id,
                                          @RequestAttribute(name = "type") String type) {
-
         try {
             List<Service> services = null;
             if (UserTypeUtils.isSuperAdmin(type)) {
@@ -217,6 +212,33 @@ public class ServiceEndpoint {
             return ResponseBuilder.build500(exception) ;
         }
 
+    }
+
+    @GetMapping("byId/{serviceId}")
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+
+    public ResponseEntity<?> getServicesById(@PathVariable(name = "serviceId") Long serviceId,
+                                             @RequestAttribute(value = "id") Long id,
+                                             @RequestAttribute(name = "type") String type) {
+        try {
+           Optional<Service> serviceOptional  = serviceService.fetchOne(serviceId);
+           if(!UserTypeUtils.isSuperAdmin(type)) {
+               if (serviceOptional.isPresent()) {
+                   if (!Objects.equals(serviceOptional.get().getClientId(), id)) {
+                       return ResponseBuilder.build400("Service not found");
+                   }
+               }
+           }
+           return ResponseBuilder.ok( serviceOptional.isPresent()? "Service Found." : "Service Not Found."
+                     , serviceOptional.orElse(null));
+        }catch (Exception exception) {
+            LOGGER.error("", exception);
+            return ResponseBuilder.build500(exception) ;
+        }
 
     }
 

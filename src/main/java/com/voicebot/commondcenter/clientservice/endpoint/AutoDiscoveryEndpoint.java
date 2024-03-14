@@ -117,7 +117,7 @@ public class  AutoDiscoveryEndpoint {
                     )).toList();
 
             for (Service service: finalServices) {
-                ArrayList<ServiceParameter> serviceParameter = service.getServiceParameters();
+                List<ServiceParameter> serviceParameter = service.getServiceParameters();
                 service.setClientId(autoDiscoverServiceRequest.getServiceId());
                 service.setApplicationId(autoDiscoverServiceRequest.getApplicationId());
                 try {
