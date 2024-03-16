@@ -1,6 +1,7 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,5 +24,9 @@ public class Step extends AbstractBaseEntity implements Serializable {
 
     @NotBlank(message = "Step id should not be null or empty.")
     private String action;
+
+    @NotNull( message = "Client should not null or empty.")
+    private Long clientId;
+
 
 }
