@@ -1,9 +1,6 @@
 package com.voicebot.commondcenter.clientservice.endpoint;
 
-
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import io.swagger.annotations.Tag;
+import com.voicebot.commondcenter.clientservice.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -13,50 +10,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*" )
-@RequestMapping(path = "/api/v1/fileupload/")
+@RequestMapping(path = "/api/v1/s3/")
 public class DocumentUploadEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentUploadEndpoint.class);
 
 
-    private AmazonS3Client amazonS3Client = new AmazonS3Client();
+    @Autowired
+    private S3Service service;
 
-
-    @PostMapping(path = "load/",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "upload/",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
                     , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
     })
-    public String uploadFile(@RequestPart(value = "file") MultipartFile file) throws IOException {
-        uploadFileTos3bucket(generateFileName(file),convertMultiPartToFile(file));
-        return(generateFileName(file));
+    public ResponseEntity<?> uploadFile(@RequestPart(value = "file") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(service.uploadFile(file).eTag());
     }
 
-    private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
-        return convFile;
+    @PostMapping(path = "/{bucket}/upload/",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(parameters = {
+            @Parameter(in = ParameterIn.HEADER
+                    , name = "X-AUTH-LOG-HEADER"
+                    , content = @Content(schema = @Schema(type = "string", defaultValue = ""))),
+    })
+    public ResponseEntity<?>  uploadFileOnBucket(@RequestPart(value = "file") MultipartFile file,@PathVariable(name = "bucket") String bucket) throws IOException {
+        return ResponseEntity.ok(service.uploadFile(file,bucket).eTag());
     }
 
-    private String generateFileName(MultipartFile multiPart) {
-        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
-    }
 
-    private void uploadFileTos3bucket(String fileName, File file) {
-        amazonS3Client.putObject(new PutObjectRequest("buuddyaidocument", fileName, file));
-                ;
-    }
 }
