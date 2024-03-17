@@ -19,8 +19,6 @@ import java.util.Date;
 @Service
 public class S3ServiceImpl implements S3Service {
 
-
-
     @Value(value = "${amazon.s3.accessKey}")
     private String accessKey;
 
