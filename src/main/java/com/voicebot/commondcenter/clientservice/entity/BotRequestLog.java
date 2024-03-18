@@ -1,5 +1,6 @@
 package com.voicebot.commondcenter.clientservice.entity;
 
+import com.voicebot.commondcenter.clientservice.enums.ChatType;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -41,5 +42,7 @@ public class BotRequestLog extends AbstractBaseEntity implements  Serializable {
     private Long client;
 
     private Long serviceLogId;
+
+    private ChatType chatType;
 
 }
