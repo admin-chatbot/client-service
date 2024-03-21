@@ -39,7 +39,7 @@ public class DocumentUploadEndpoint {
     @Autowired
     private DocumentUploadService documentUploadService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "save/",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(parameters = {
             @Parameter(in = ParameterIn.HEADER
                     , name = "X-AUTH-LOG-HEADER"
@@ -52,11 +52,12 @@ public class DocumentUploadEndpoint {
     public ResponseEntity<?> onBoard(
             @RequestAttribute(name = "id") Long id,
             @RequestAttribute(name = "type") String type,
-            @RequestParam("file") MultipartFile file,
             @RequestParam("clientId") Long clientId,
             @RequestParam("fileName") String fileName,
             @RequestParam("description") String description,
-            @RequestParam("category") String category) {
+            @RequestParam("category") String category,
+            @RequestPart(value = "file") MultipartFile file)
+    {
         try {
             // Create a DocumentUpload instance
             DocumentUpload documentUpload = DocumentUpload.builder()
